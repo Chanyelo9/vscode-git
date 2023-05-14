@@ -1,4 +1,8 @@
 ## Git操作
+### 参考：
+* https://note.youdao.com/s/aKqzMPN0
+* [有道云———git操作详细](https://note.youdao.com/ynoteshare/index.html?id=b4235df17e3e05dbd63a1e666226ecb3&type=notebook&_time=1684028149275#/2A34A2DA02534033B70B6F0629B2E705)
+
 ### 上传文件夹到GitHub
 
 * **[参考链接](https://blog.csdn.net/jojowei/article/details/89008657)**
