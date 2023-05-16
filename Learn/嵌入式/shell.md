@@ -36,7 +36,7 @@ root@linux:~# vim hello.sh
 #!/bin/bash
 echo "hello world"
 ```
-* ### 3.脚本的常用执行方式
+ ## 3.脚本的常用执行方式
   * #### 1.采用bash或sh+脚本的相对路径或绝对路径（不用赋予脚本+x权限）
   ![](${currentFileDir}/20230515151805.png)
   ```
@@ -100,7 +100,7 @@ echo "hello world"
    ![](${currentFileDir}/20230515173919.png)
 * #### 2）实例操作
    ![](${currentFileDir}/20230515173942.png)
-* ### 3.3 $@，￥*
+* ### 3.3 ￥*， ￥@
 * #### 1）基本语法
    ![](${currentFileDir}/20230515174315.png)
 * ### 3.4 $？
@@ -110,8 +110,8 @@ echo "hello world"
   判断hello.sh脚本是否正确执行
   ![](${currentFileDir}/20230515174821.png)
 
-## 4.运算符
-* ### 基本语法
+# 四、运算符
+* ## 基本语法
   ![](${currentFileDir}/20230515181524.png)
   > 也可以用expr，如expr 1 + 2，需要用空格，用乘法要进行转义\*.
   ```
@@ -119,8 +119,9 @@ echo "hello world"
   # a=`expr 5 \* 3`
   # a=$(expr 5\* 3)
   ```
-## 5.条件判断
-* ### 1）基本语法
+  ### * 条件判断[]里要空格，运算不需要。
+# 五、条件判断
+* ## 1.基本语法
   ![](${currentFileDir}/20230515191308.png)
   ```
   (1)
@@ -130,25 +131,145 @@ echo "hello world"
   # [ $a = hello ]
   # echo $?
   ```
-* ### 2）常用判断条件
-  #### （1）两个整数比较
+* ## 2.常用判断条件
+  ### （1）两个整数比较
   ![](${currentFileDir}/20230515191352.png)
-  #### （2）按照文件权限进行判断
+  ### （2）按照文件权限进行判断
   ![](${currentFileDir}/20230515192617.png)
-  #### （3）按照文件类型进行判断
+  ### （3）按照文件类型进行判断
   ![](${currentFileDir}/20230515192732.png)
   > **补充：**
   ![](${currentFileDir}/20230515193657.png)
 
-## 6.流程控制
-* ### 1）基本语法
+# 六、流程控制
+* ## 1.基本语法
+* ### （1）单分支
   ![](${currentFileDir}/20230515194521.png)
   > 拓展用法
   root@linux:/home# cd /home/; ls -l
   root@linux:/home# 
-  
+
   **或者**
   ![](${currentFileDir}/20230515194547.png)
-* #### （1）单分支
-* #### （2）多分支
-* #### （1）
+  ****
+  **多条件时，有两种表达方式：**
+  ```
+  1. if [ $a -gt 18 ] && [ $a -lt 35 ]; then echo OK; fi
+  2.if [ $a -gt 18 -a $a -lt 35 ]; then echo OK; fi
+  其中，与是-a，或是-o
+  ```
+  ****
+  **在编写shell时，为避免空指针，可以添加双引号和x：**
+  ![](${currentFileDir}/20230516102128.png)
+  
+* ### （2）多分支
+  ![](${currentFileDir}/20230516104153.png)
+  > 注意：
+  ![](${currentFileDir}/20230516104238.png)
+
+* ## 2.case
+* ### （1）基本语法
+  ![](${currentFileDir}/20230516105243.png)
+  > 注意
+  ![](${currentFileDir}/20230516105145.png)
+
+* ## 3.for
+* ### （1）基本语法
+  ![](${currentFileDir}/20230516110442.png)
+* ### （2）案例实操
+  从1加到100：
+  ![](${currentFileDir}/20230516110546.png)
+* ### （3）基本语法2
+  ![](${currentFileDir}/20230516114322.png)
+  ```
+  # for os in linux windows macos; do echo $os; done
+  # for i in {1..100}; do sum=$[$sum+$i]; done; echo $sum
+  ```
+   #### 比较$*和$@区别
+  ![](${currentFileDir}/20230516123905.png)
+  * 1.
+    ![](${currentFileDir}/20230516125440.png)
+    ![](${currentFileDir}/20230516125745.png)
+  * 2.
+    ![](${currentFileDir}/20230516130731.png)
+    ![](${currentFileDir}/20230516125702.png)
+* ## 4.while
+* ### （1）基本语法
+  ![](${currentFileDir}/20230516130852.png)
+  * #### 可调用高级语法
+    案例：从1加到100
+    ![](${currentFileDir}/20230516132625.png)
+
+# 七、read读取控制台输入
+* ## 1.基本语法
+  ![](${currentFileDir}/20230516133150.png)
+* ## 2.案例实操
+  ![](${currentFileDir}/20230516133802.png)
+  ![](${currentFileDir}/20230516133833.png)
+
+# 八、函数
+## 1.系统函数（也可称命令替换）
+* ### **在脚本中调用系统函数/系统命令**
+    使用$( 系统命令 )
+  * #### 定义日志文件使用脚本自动生成：
+    ![](${currentFileDir}/20230516151915.png)
+  * #### ${var}，即是加一个大括号来限定变量名称的范围，看清定义的变量的范围，不加也行。
+    ![](${currentFileDir}/20230516165338.png)
+* ### 1）basename
+  * #### （1）基本语法
+    ![](${currentFileDir}/20230516150445.png)
+  * #### （2）案例
+    ![](${currentFileDir}/20230516150601.png)
+
+* ### 2）dirname
+  * #### （1）基本语法
+    ![](${currentFileDir}/20230516152946.png)
+  * #### （2）案例
+    ![](${currentFileDir}/20230516154922.png)
+## 2.自定义函数
+* ### 1）基本语法
+  ![](${currentFileDir}/20230516155520.png)
+* ### 2）技巧
+  ![](${currentFileDir}/20230516155652.png)
+* ### 3）案例
+  ![](${currentFileDir}/20230516160940.png)
+
+# 九、综合应用
+![](${currentFileDir}/20230516162112.png)
+```
+# vim daily_archive.sh
+# chmod u+x daily_archive.sh
+# ./daily_archive.sh /root/scripts
+# mkdir /root/archive
+# ./daily_archive.sh /root/scripts
+# crontab -l
+# crontab -e
+编辑内容：0 2 * * * /root/scripts/daily_archive.sh /root/scripts
+```
+
+# 十、正则表达式
+![](${currentFileDir}/20230516170610.png)
+## 支持扩展：grep -E
+  ![](${currentFileDir}/20230516174109.png)
+  其中表示0-9可以重复9次，[0,-9]{9}
+## 1.常规匹配
+![](${currentFileDir}/20230516171005.png)
+## 2.常用特殊字符
+* ### （1）特殊字符：^
+  ![](${currentFileDir}/20230516171126.png)
+* ### （2）特殊字符：$
+  ![](${currentFileDir}/20230516171424.png)
+* ### （3）特殊字符：.
+  ![](${currentFileDir}/20230516171527.png)
+* ### （4）特殊字符：*
+  ![![](${currentFileDir}/20230516171527.png)](${currentFileDir}/20230516172103.png)
+* ### （5）字符区间：[]
+  ![](${currentFileDir}/20230516172811.png)
+
+# 十一、文本处理工具
+## 1.cut
+
+## 2.awk
+
+
+
