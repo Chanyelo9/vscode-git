@@ -268,8 +268,45 @@ echo "hello world"
 
 # 十一、文本处理工具
 ## 1.cut
-
+![](${currentFileDir}/20230516195111.png)
+* ### 1）基本用法
+  ![](${currentFileDir}/20230516195309.png)
+* ### 2）选项参数说明
+  ![](${currentFileDir}/20230516195247.png)
+* ### 3）案例
+  ![](${currentFileDir}/20230516201533.png)
+  ![](${currentFileDir}/20230516201616.png)
+  ![](${currentFileDir}/20230516202157.png)
 ## 2.awk
+![](${currentFileDir}/20230516203554.png)
+* ### 1）基本用法
+  ![](${currentFileDir}/20230516203639.png)
+* ### 2）选项参数说明
+  ![](${currentFileDir}/20230516203708.png)
+* ### 3）案例
+  ![](${currentFileDir}/20230516204515.png)
+  * #### (1)(2)可以用cat代替，不用输入filename，直接用cat打开
+   ```
+   root@linux:~/scripts# cat /etc/passwd | grep ^root | cut -d ":" -f 7
+   /bin/bash
+   root@linux:~/scripts# cat /etc/passwd | awk  -F ":" '/^root/{print $7}'
+   /bin/bash
+    ```
+  ![](${currentFileDir}/20230516205756.png)
+* ### 4）awk的内置变量
+  ![](${currentFileDir}/20230516210053.png)
+* ### 5）案例
+  ![](${currentFileDir}/20230516211157.png)
+* ### 6）awk VS grep
+  显示行号：
+  ![](${currentFileDir}/20230516211618.png)
+  其中：^$ 表示空行。
+  
+  
+  ![](${currentFileDir}/20230516212212.png)
+
+# 十二、综合应用：发送消息
+![](${currentFileDir}/20230516213228.png)
 
 
 
