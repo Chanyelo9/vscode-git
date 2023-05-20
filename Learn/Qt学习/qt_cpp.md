@@ -5,7 +5,11 @@ Linux桌面环境下KDE，WPS，网络电话，谷歌地图，VLC多媒体播放
 
 ![](${currentFileDir}/20230520193111.png)
 
+![](${currentFileDir}/20230520193928.png)
 
+基本使用：
+QPushButton是Widget的子类。
+![](${currentFileDir}/20230520195903.png)
 
 #课程来源于“B站北京讯为电子”
 信号：控件发出特定的信号。
@@ -13,6 +17,17 @@ Linux桌面环境下KDE，WPS，网络电话，谷歌地图，VLC多媒体播放
 如何关联信号和槽：1.自动关联；2.手动关联。
 2.手动关联，使用connect函数：
 ![](${currentFileDir}/20230518103615.png)
+
+> connect(myBtn,&MyPushButton::clicked,this,&MyPushButton::close);
+> 参数：1.信号发送者（指针）2.发送的信号地址3.信号的接收者（指针）4.槽函数地址
+
+emit:触发自定义信号
+
+
+对象树：
+![](${currentFileDir}/20230520203017.png)
+
+
 
 Qt三驾马车：
 1.Qt下的串口编程
