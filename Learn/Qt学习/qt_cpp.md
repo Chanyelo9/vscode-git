@@ -1,3 +1,5 @@
+[TOC]
+#课程来源于“斧头帮帮主“
 案例：
 Linux桌面环境下KDE，WPS，网络电话，谷歌地图，VLC多媒体播放器，虚拟机软件。。。
 
@@ -22,11 +24,254 @@ QPushButton是Widget的子类。
 > 参数：1.信号发送者（指针）2.发送的信号地址3.信号的接收者（指针）4.槽函数地址
 
 emit:触发自定义信号
-
+函数指针的返回类型void
 
 对象树：
 ![](${currentFileDir}/20230520203017.png)
 
+lambda表达式：版本低在Pro文件下加CONFIG += c++11
+![](${currentFileDir}/20230521115859.png)
+
+![](${currentFileDir}/20230521170214.png)
+
+
+# QMainWindow：
+## 1、自定义对话框
+菜单、工具栏、状态栏、铆接部件、核心部件的创建：
+```C++
+//1.菜单栏,只有一个
+QMenuBar *bar = menuBar();
+//菜单栏设置到窗口中
+this->setMenuBar(bar);
+//添加 菜单
+QMenu *fileMenu = bar->addMenu("文件");
+QMenu *editMenu = bar->addMenu("编辑");
+//添加菜单项
+QAction *newAction = fileMenu->addAction("新建");
+//添加分割线
+fileMenu->addSeparator();
+QAction *openAction = fileMenu->addAction("打开");
+
+//菜单项中添加子菜单
+QMenu *subMenu = new QMenu;
+subMenu->addAction("子菜单1");
+subMenu->addAction("子菜单2");
+newAction->setMenu(subMenu);
+
+//2.工具栏 可以有多个
+QToolBar *toolBar = new QToolBar(this);
+//将工具栏设置到窗口
+addToolBar(Qt::LeftToolBarArea,toolBar);
+//设置只允许左右停靠
+toolBar->setAllowedAreas(Qt::LeftToolBarArea | Qt::RightToolBarArea);
+//设置浮动
+toolBar->setFloatable(false);
+//设置移动
+toolBar->setMovable(false);
+//添加菜单项
+toolBar->addAction(newAction);
+toolBar->addSeparator();
+toolBar->addAction(openAction);
+
+//3.状态栏 只有一个
+QStatusBar *sBar = statusBar();
+setStatusBar(sBar);
+QLabel *label1 = new QLabel("左侧信息",this);
+sBar->addWidget(label1);
+QLabel *label2 = new QLabel("右侧信息",this);
+sBar->addPermanentWidget(label2);
+QLabel *label3 = new QLabel("左侧信息2",this);
+sBar->insertWidget(0,label3);
+
+//4.铆接部件 浮动窗口 可以多个
+QDockWidget *dock = new QDockWidget("浮动窗口",this);
+addDockWidget(Qt::BottomDockWidgetArea,dock);
+//设置只允许上下停靠
+dock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
+
+//5.核心部件 中心部件 只有一个
+QTextEdit *edit = new QTextEdit(this);
+setCentralWidget(edit);
+```
+
+菜单栏添加图标：
+![](${currentFileDir}/20230522111639.png)
+
+对话框的创建：
+```c++
+//新建弹出对话框
+connect(ui->actionnew,&QAction::triggered,[=](){
+
+//对话框分类
+//模态对话框  不可以对其他窗口操作  阻塞
+//非模态对话框  可以对其他窗口操作   非阻塞
+
+//创建模态对话框
+QDialog dlg(this);
+dlg.resize(200,100);
+dlg.exec();
+
+//创建非模态对话框
+QDialog *dlg = new QDialog;
+dlg->show();
+//销毁对话框 防止内存泄漏
+//设置属性 55号 使Qt在小部件接受关闭事件时删除该小部件
+dlg->setAttribute(Qt::WA_DeleteOnClose);
+
+qDebug()<<"弹出对话框";
+});//trigger触发
+```
+设置对话框属性：QWidget::setAttribute()
+查找：
+![](${currentFileDir}/20230522114523.png)
+
+![](${currentFileDir}/20230522114538.png)
+
+## 2、消息对话框，系统提供QMessageBox即模态对话框
+```c++
+//QMessageBox 消息对话框
+//1.错误提示
+//QMessageBox::critical(this,"critical","错误!");
+//2.消息提示
+//QMessageBox::information(this,"info","消息提示!");
+//3.询问提示
+//参数1 父窗口 参数2 标题 参数3 中间显示文本框 参数4按键类型 参数5关联回车按键
+//QMessageBox::question(this,"question","询问：",QMessageBox::Save | QMessageBox::Cancel);
+if(QMessageBox::Save == QMessageBox::question(this,"question","询问：",QMessageBox::Save | QMessageBox::Cancel,QMessageBox::Cancel))
+{
+    qDebug()<<" choose save ";
+}
+else {
+    qDebug()<<" choose cancel ";
+}
+
+//4.警告提示
+QMessageBox::warning(this,"warning","警告！");
+```
+
+## 3、其他对话框：颜色、字体、文件
+```c++
+//颜色对话框
+ QColor color = QColorDialog::getColor(QColor(255,0,0));
+ qDebug()<<color.red()<<color.blue()<<color.green();
+ 
+ //字体对话框
+ bool ok;
+ QFont font = QFontDialog::getFont(&ok,QFont("宋体",30));
+ qDebug()<<"字体："<<font.family()<<"字号："<<font.pointSize()<<"加粗:"<<font.bold()<<"倾斜："<<font.italic();
+
+ //文件对话框
+ QString str = QFileDialog::getOpenFileName(this,"打开文件","E:\Wins_Qt\111\04_QResource\04_QResource","*.h *.cpp" );
+ qDebug()<<str;
+```
+![](${currentFileDir}/20230522150823.png)
+
+
+## QListWidget
+```c++
+//listWidget使用、
+QListWidgetItem *item = new QListWidgetItem("hahahhahhah");
+ui->listWidget->addItem(item);
+//设置文本对齐方式
+item->setTextAlignment(Qt::AlignHCenter);
+
+//QStringList->QList<QString>->list<string>
+QStringList list;
+list<<"aaa"<<"bbb"<<"ccc"<<"ddd";
+list.push_back("aaa");
+
+ui->listWidget->addItems(list);
+```
+
+## QTreeWidget
+```C++
+//treeWidget  树控件
+//1.设置头标签
+ui->treeWidget->setHeaderLabels(QStringList()<<"英雄"<<"英雄介绍");
+
+//2.Item创建
+QTreeWidgetItem *liItem = new QTreeWidgetItem(QStringList()<<"力量");
+//添加顶层级别的Item
+ui->treeWidget->addTopLevelItem(liItem);
+
+QTreeWidgetItem *secItem = new QTreeWidgetItem(QStringList()<<"敏捷");
+ui->treeWidget->addTopLevelItem(secItem);
+QTreeWidgetItem *thrItem = new QTreeWidgetItem(QStringList()<<"智力");
+ui->treeWidget->addTopLevelItem(thrItem);
+
+QStringList heroL1;
+heroL1 <<"刚被猪"<<"前排坦克，能在吸收伤害的同时造成可观的范围输出";
+QStringList heroL2;
+heroL2<<"船长"<<"前排坦克，能肉能输出能控场的全能英雄";
+QStringList heroM1;
+heroM1 <<"月骑"<<"中排物理输出，可以使用分裂利刃攻击多个目标";
+QStringList heroM2;
+heroM2<<"小鱼人"<<"前排战士，擅长偷取敌人的属性来增强自身战力";
+QStringList heroZ1;
+heroZ1 <<"死灵法师"<<"前排法师坦克，魔法抗性较高，拥有治疗技能";
+QStringList heroZ2;
+heroZ2<<"巫医"<<"后排辅助法师，可以使用奇特的巫术诅咒敌人与治疗队友" ;
+
+//3.创建子Item挂载到顶层Item上
+QTreeWidgetItem *l1 = new QTreeWidgetItem(heroL1);
+liItem->addChild(l1);
+```
+
+## QTableWidget
+```C++
+//tableWidget使用
+//1.设置列数
+ui->tableWidget->setColumnCount(3);
+//2.设置水平表头标签
+ui->tableWidget->setHorizontalHeaderLabels(QStringList()<<"姓名"<<"性别"<<"年龄");
+//3.设置行数
+ui->tableWidget->setRowCount(5);
+
+//4.设置正文
+//ui->tableWidget->setItem(0,0, new QTableWidgetItem("亚索"));
+
+QStringList nameList;
+nameList<<"亚索"<<"安其拉"<<"扁鹊"<<"夏洛特"<<"橘右京";
+QList<QString> sexList;//定义用法同上
+sexList<<"x"<<"o"<<"x"<<"o"<<"x";
+for(int i = 0; i< 5; i++)
+{
+    int column = 0;
+    ui->tableWidget->setItem(i,column++,new QTableWidgetItem(nameList[i]));
+    ui->tableWidget->setItem(i,column++,new QTableWidgetItem(sexList.at(i)));
+    //int转qstring  QString::number(int)
+    ui->tableWidget->setItem(i,column++,new QTableWidgetItem(QString::number(18+i)));;
+}
+
+//添加英雄赵云
+connect(ui->addBt,&QPushButton::clicked,[=](){
+//如果有则不添加
+bool isEmpty = ui->tableWidget->findItems("赵云",Qt::MatchExactly).isEmpty();
+if(!isEmpty)
+{
+    QMessageBox::warning(this,"警告","已经有赵云，添加失败");
+}
+else {
+    ui->tableWidget->insertRow(0);
+    ui->tableWidget->setItem(0,0,new QTableWidgetItem(QString("赵云")));
+    ui->tableWidget->setItem(0,1,new QTableWidgetItem(QString("x")));
+    ui->tableWidget->setItem(0,2,new QTableWidgetItem(QString::number(29)));
+}
+});
+
+//删除英雄
+connect(ui->deleteBt,&QPushButton::clicked,[=](){
+        bool isEmpty = ui->tableWidget->findItems("赵云",Qt::MatchExactly).isEmpty();
+if(isEmpty)
+{
+    QMessageBox::warning(this,"警告","没有赵云");
+}
+else {
+    int rowNum = ui->tableWidget->findItems("赵云",Qt::MatchExactly).first()->row();
+    ui->tableWidget->removeRow(rowNum);
+    }
+});
+```
 
 
 Qt三驾马车：
@@ -34,7 +279,7 @@ Qt三驾马车：
 2.Qt下的网络编程
 3.Qt下操作GPIO
 
-Qt打包和部署：
+# Qt打包和部署：
 1.把工厂切换到release模式，然后编译。
 release模式：几乎没有调试信息。
 debug模式：有很多调试信息。
@@ -52,5 +297,5 @@ UDP编程：
 UDP不分客户端和服务器，只需要使用一个类QUdpSocket。
 
 
-### 快捷键
+## 快捷键
 Ctrl选中，可同时修改文本内容。
