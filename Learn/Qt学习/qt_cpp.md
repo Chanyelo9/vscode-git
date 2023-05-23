@@ -273,6 +273,177 @@ else {
 });
 ```
 
+## 其他常用控件
+```c++
+//默认选中第一个
+ui->stackedWidget->setCurrentIndex(0);
+
+connect(ui->tabBt,&QPushButton::clicked,[=](){
+    ui->stackedWidget->setCurrentIndex(0);
+});
+
+connect(ui->toolBt,&QPushButton::clicked,[=](){
+    ui->stackedWidget->setCurrentIndex(1);
+});
+
+connect(ui->scorllBt,&QPushButton::clicked,[=](){
+    ui->stackedWidget->setCurrentIndex(2);
+});
+
+//combo box下拉框
+ui->comboBox->addItem("夏鸣星");
+ui->comboBox->addItem("夏彦");
+ui->comboBox->addItem("艾因");
+
+//点击按键，定位相应选项
+connect(ui->selectBt,&QPushButton::clicked,[=](){
+    ui->comboBox->setCurrentIndex(0);
+});
+
+//利用QLabel显示图片
+//ui->label_2->setPixmap(QPixmap(":/res/led.svg"));
+//图片大小不变
+QPixmap pix;
+pix.load(":/res/led.svg");
+ui->label_2->setPixmap(pix);
+ui->label_2->setFixedSize(pix.width(),pix.height());
+
+//利用QLabel显示GIF动图
+//    QMovie *movie = new QMovie(":/res/ty2.gif");
+//    ui->label_3->setMovie(movie);
+//    movie->start();
+
+//    movie->setSpeed(200);
+
+//    movie->stop();
+
+//gif设定为label大小
+QMovie *mv = new QMovie(":/res/ty2.gif");
+QSize size(ui->label_3->width(),ui->label_3->height());
+mv->setScaledSize(size);
+//mv->start();
+ui->label_3->setMovie(mv);
+
+connect(ui->smileBt,&QPushButton::clicked,[=](){
+    connect(ui->smileBt,&QPushButton::clicked,[=](){
+        mv->stop();
+    });
+    mv->start();
+    //播放一次完就结束
+    connect(mv,&QMovie::frameChanged,[=](int frameID){
+        if(frameID == mv->frameCount() -1)
+        {
+            mv->stop();
+        }
+    });
+});
+```
+
+## 自定义控件的封装
+> smallWidget.cpp
+```c++
+SmallWidget::SmallWidget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::SmallWidget)
+{
+    ui->setupUi(this);
+    //spinBox数字改变 slider跟着滑动
+    void(QSpinBox:: *signal)(int) = &QSpinBox::valueChanged;
+    connect(ui->spinBox,signal,ui->horizontalSlider,&QSlider::setValue);
+
+    //slide变化，spinBox也变化
+    connect(ui->horizontalSlider,&QSlider::valueChanged,ui->spinBox,&QSpinBox::setValue);
+
+
+}
+
+//设置数据
+void SmallWidget::setData(int val)
+{
+    ui->horizontalSlider->setValue(val);
+}
+
+//获取数据
+int SmallWidget::getData()
+{
+    return ui->horizontalSlider->value();
+}
+```
+
+> widget.cpp
+```c++
+//点击设置到一半的按钮
+connect(ui->setBt,&QPushButton::clicked,[=](){
+    ui->widget->setData(50);
+});
+
+
+//点击获取值的按钮
+connect(ui->getBt,&QPushButton::clicked,[=](){
+    qDebug() << ui->widget->getData();
+});
+```
+
+
+
+
+## 鼠标的常用事件
+1.先创建一个MyLabel类
+2.QLabel提升为MyLabel
+```c++
+#include "mylabel.h"
+#include <QDebug>
+#include <QMouseEvent>
+
+MyLabel::MyLabel(QWidget *parent) : QLabel(parent)
+{
+    //设置鼠标追踪,即不点击就显示鼠标移动
+    this->setMouseTracking(true);
+}
+
+//鼠标进入
+void MyLabel::enterEvent(QEvent *)
+{
+    qDebug()<<"鼠标进入";
+}
+
+//鼠标离开
+void MyLabel::leaveEvent(QEvent *)
+{
+    qDebug()<<"鼠标离开";
+}
+
+
+//鼠标移动事件,联合按键用buttons
+void MyLabel::mouseMoveEvent(QMouseEvent *ev)
+{
+//    if(ev->buttons() & Qt::LeftButton)
+//    {
+            qDebug()<<"鼠标移动,lllla";
+//    }
+}
+
+//鼠标按下事件,瞬间发生的用button
+void MyLabel::mousePressEvent(QMouseEvent *ev)
+{
+    //如果左键按下才运行
+    if(ev->button() == Qt::LeftButton)
+    {
+        QString str = QString("鼠标按下,x = %1, y = %2").arg(ev->x()).arg(ev->y())    ;
+        qDebug()<<str;
+    }
+}
+
+//鼠标离开事件，瞬间发生的用button
+void MyLabel::mouseReleaseEvent(QMouseEvent *ev)
+{
+    qDebug()<<"鼠标释放";
+}
+
+```
+
+位运算&：全真才为真
+
 
 Qt三驾马车：
 1.Qt下的串口编程
