@@ -441,8 +441,155 @@ void MyLabel::mouseReleaseEvent(QMouseEvent *ev)
 }
 
 ```
+```c++
+//鼠标进入
+void enterEvent(QEvent *);
+
+//鼠标离开
+void leaveEvent(QEvent *);
+
+//鼠标按下事件
+void mouseMoveEvent(QMouseEvent *ev);
+
+//鼠标离开事件
+void mousePressEvent(QMouseEvent *ev);
+
+//鼠标移动事件
+void mouseReleaseEvent(QMouseEvent *ev);
+```
 
 位运算&：全真才为真
+
+## event事件分发器
+用于分发事件，在这里也可以做拦截,返回值boo1如果返回的是true代表拦截处理，不在向下分发。
+> myLabel.cpp
+```C++
+//事件分发器
+bool MyLabel::event(QEvent *e)
+{
+    if(e->type() == QEvent::MouseButtonPress)
+    {
+        QMouseEvent *ev = static_cast<QMouseEvent*>(e);
+        QString str = QString("在event中 鼠标按下,x = %1, y = %2").arg(ev->x()).arg(ev->y());
+        qDebug()<<str;
+        return  true;//拦截事件，不向下分发事件
+    }
+    //其他事件交给父类处理
+    return QLabel::event(e);
+}
+```
+> myLabel.h
+```c++
+//事件分发器
+bool event(QEvent *e);
+```
+
+
+## 事件过滤器
+![](${currentFileDir}/20230524101828.png)
+> widget.cpp
+```c++
+#include <QDebug>
+#include <QMouseEvent>
+
+Widget::Widget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::Widget)
+{
+    ui->setupUi(this);
+
+    //利用事件过滤器 拦截label的鼠标按下事件
+    //1.先给控件安装过滤器
+    ui->label->installEventFilter(this);
+    //2.重写过滤器事件
+}
+
+//过滤器事件
+//参数1判断控件，参数2判断事件
+bool Widget::eventFilter(QObject *obj, QEvent *e)
+{
+    if(obj == ui->label)
+    {
+        if(e->type() == QEvent::MouseButtonPress)
+        {
+            QMouseEvent *ev = static_cast<QMouseEvent*>(e);
+            QString str = QString("在事件过滤器中 鼠标按下，x = %1, y = %2").arg(ev->x()).arg(ev->y());
+            qDebug()<<str;
+            return true;
+        }
+
+        //其他事件交给父类处理
+        return QWidget::eventFilter(obj,e);
+    }
+}
+```
+> widget.h
+```c++
+//声明过滤器事件
+bool eventFilter(QObject *,QEvent *);
+```
+
+## 定时器事件
+> widget.cpp
+```c++
+#include "widget.h"
+#include "ui_widget.h"
+
+Widget::Widget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::Widget)
+{
+    ui->setupUi(this);
+    //启动定时器
+    this->m_Id1 = startTimer(1000);//毫秒
+
+    this->m_Id2 = startTimer(2000);
+}
+
+//定时器事件
+void Widget::timerEvent(QTimerEvent *e)
+{
+    if(e->timerId() == m_Id1)
+    {
+        //设为静态，在全局就不会发生重置
+        static int num = 1;
+        ui->label->setText(QString::number(num++));
+    }
+    if(e->timerId() == m_Id2)
+    {
+        static int num2 = 1;
+        ui->label_2->setText(QString::number(num2++));
+    }
+}
+```
+> widget.h
+```c++
+    //定时器事件
+    void timerEvent(QTimerEvent *);
+
+    //在h文件里声明就不会随便被释放
+    int m_Id1;
+
+    int m_Id2;
+```
+
+### 定时器类
+> widget.cpp
+```c++
+//定时器类,应用更多，定时器间是独立的
+    QTimer *timer = new QTimer(this);
+    timer->start(500);
+    //监听定时器对象的信号
+    connect(timer,&QTimer::timeout,[=](){
+        static int num = 1;
+        ui->label_3->setText(QString::number(num++));
+    });
+
+    //暂停按钮
+    connect(ui->stopBt,&QPushButton::clicked,[=](){
+        timer->stop();
+    });
+```
 
 
 Qt三驾马车：
@@ -468,5 +615,288 @@ UDP编程：
 UDP不分客户端和服务器，只需要使用一个类QUdpSocket。
 
 
-## 快捷键
+# 绘图
+## 基本绘图
+```c++
+//绘图事件
+void paintEvent(QPaintEvent *);
+```
+> 画笔QPen
+> 画刷QBrush
+```c++
+//重写绘图事件
+void  Widget::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);//this代表绘图设备，画家向当前窗口画画
+
+    //画笔
+    QPen pen(QColor(255,0,0));
+    //宽度
+    pen.setWidth(3);
+    //风格
+    pen.setStyle(Qt::DotLine);
+    //画家使用画笔
+    painter.setPen(pen);
+
+    //画刷 可以填充封闭的图案
+    QBrush brush(Qt::cyan);
+    //画刷风格
+    brush.setStyle(Qt::Dense5Pattern);
+    //使用画刷
+    painter.setBrush(brush);
+
+
+
+    //画线
+    painter.drawLine(QPoint(0,0),QPoint(100,100));
+
+    //画圆
+    painter.drawEllipse(QPoint(100,100),50,50);
+
+    //画矩形
+    painter.drawRect(QRect(150,150,50,50));
+
+    // 写字
+    painter.setFont(QFont("华文彩云",20));
+    painter.drawText(QRect(0,200,100,100),"love you\n夏鸣星");
+}
+```
+
+## 高级绘图
+```c++
+#include "widget.h"
+#include "ui_widget.h"
+#include <QPainter>
+#include <QTimer>
+
+Widget::Widget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::Widget)
+{
+    ui->setupUi(this);
+
+    posX = 0;
+    //点击移动图片
+    connect(ui->pushButton,&QPushButton::clicked,[=](){
+       posX += 10;
+       //手动调用绘图事件
+       update();
+    });
+
+    //实现自动让图片移动
+    QTimer *timer = new QTimer(this);
+
+    timer->start(5);
+    connect(timer,&QTimer::timeout,[=](){
+        posX++;
+        update();
+    });
+}
+
+void  Widget::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);//this代表绘图设备，画家向当前窗口画画
+    ////////////////高级绘图/////////////////
+//    painter.drawEllipse(QPoint(100,100),50,50);
+
+//    //抗锯齿效果
+//    painter.setRenderHint(QPainter::Antialiasing);
+//    painter.drawEllipse(QPoint(150,100),50,50);
+
+//    painter.drawRect(QRect(200,200,50,50));
+
+//    painter.translate(100,0);//移动画家
+//    painter.save();//保存状态
+//    painter.drawRect(QRect(200,200,50,50));//恢复状态
+//    painter.translate(100,0);//移动画家
+//    painter.restore();
+//    painter.drawRect(QRect(200,200,50,50));
+
+    //画成品图案
+    QPixmap pix;
+    pix.load(":res/doge.jpg");
+    painter.drawPixmap(posX,0,pix);
+    //painter.drawPixmap(QRect(50,50,50,50),pix,QRect(150,150,150,150));
+
+    if(posX > this->width())
+    {
+        posX = -pix.width();
+    }
+}
+```
+
+
+## 绘图设备
+绘图设备是指继承QPainterDevice的子类。
+![](${currentFileDir}/20230524163547.png)
+
+```c++
+#include "widget.h"
+#include "ui_widget.h"
+#include <QPainter>
+
+Widget::Widget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::Widget)
+{
+ui->setupUi(this);
+//QPixmap做绘图设备 对不同平台做了显示优化
+QPixmap pix(300,300);
+pix.fill(Qt::white);
+QPainter painter(&pix);
+painter.setPen(QPen(Qt::red));
+painter.drawEllipse(QPoint(100,100),50,50);
+pix.save("E:\\Wins_Qt\\111\\15_QPainterDevice\\15_QPainterDevice\\picsave\\pix.png");
+
+QImage做绘图设备 专门为像素级的访问做了优化
+QImage img(300,300,QImage::Format_RGB32);
+img.fill(Qt::gray);
+QPainter painter(&img);
+painter.setPen(QPen(Qt::black));
+painter.drawEllipse(QPoint(150,150),100,100);
+img.save("E:\\Wins_Qt\\111\\15_QPainterDevice\\15_QPainterDevice\\picsave\\pix2.png");
+}
+
+void Widget::paintEvent(QPaintEvent *)
+{
+   QPainter painter(this);
+
+   QImage img;
+   img.load(":/res/doge.jpg");
+
+   for(int i = 100;i<150;i++)
+   {
+       for(int j=100;j<150;j++)
+       {
+           //QRgb val = qRgb(255,0,0);
+           QRgb val = img.pixel(j,i);
+           img.setPixel(i,j,val);
+       }
+   }
+
+   painter.drawImage(0,0,img);
+}
+
+```
+
+```c++
+#include "widget.h"
+#include "ui_widget.h"
+#include <QPainter>
+#include <QPicture>
+
+Widget::Widget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::Widget)
+{
+    ui->setupUi(this);
+//QPicture做绘图设备 记录和重载画家的绘图指令
+QPicture pic;
+QPainter painter;
+painter.begin(&pic);
+
+painter.setPen(QPen(Qt::red));
+painter.drawEllipse(QPoint(150,150),100,100);
+
+painter.end();
+pic.save("E:\\Wins_Qt\\111\\15_QPainterDevice\\15_QPainterDevice\\picsave\\pic.zt");
+}
+
+void Widget::paintEvent(QPaintEvent *)
+{
+    //重现绘图指令
+    QPainter painter(this);
+    QPicture pic;
+    pic.load("E:\\Wins_Qt\\111\\15_QPainterDevice\\15_QPainterDevice\\picsave\\pic.zt");
+    painter.drawPicture(0,0,pic);
+}
+
+
+```
+
+
+QImage与QPixmap的区别：
+![](${currentFileDir}/20230524172149.png)
+
+# QFile文件读写
+```c++
+#include "widget.h"
+#include "ui_widget.h"
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QFile>
+#include <QTextCodec>
+
+Widget::Widget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::Widget)
+{
+    ui->setupUi(this);
+
+    //点击选择按钮，弹出文件对话框，读取桌面文件，文件路径放入到lineEdit，文件内容放到textEdit
+    connect(ui->pushButton,&QPushButton::clicked,[=](){
+        QString filePath = QFileDialog::getOpenFileName(this,"打开文件","C:\\Users\\Dell\\Desktop\\List.txt","*.txt");
+        if(filePath.isEmpty())
+        {
+            QMessageBox::warning(this,"警告","路径不能为空");
+        }
+        else {
+            ui->lineEdit->setText(filePath);
+
+            //指定编码格式
+            QTextCodec *codec =  QTextCodec::codecForName("gbk");
+
+            //读取文件信息
+            QFile file(filePath);
+            //指定打开方式
+            file.open(QIODevice::ReadOnly);
+
+            QByteArray arr;
+            //arr = file.readAll();//读取全部
+
+            if(!file.atEnd())
+            {
+                arr += file.readLine();//单行读取
+            }
+
+            //默认支持编码格式utf-8
+            ui->textEdit->setText(arr);
+            //ui->textEdit->setText(codec->toUnicode(arr));
+
+            //关闭文件
+            file.close();
+
+            //写文件
+            file.open(QIODevice::Append);
+            file.write("////////");
+            file.close();
+        }
+    });
+
+}
+```
+
+# QFileinfo 文件信息读写
+* ### 可用于查看文件的后缀名 大小 文件名 文件路径 创建日期 最后的修改日期 
+```c++
+#include <QFileInfo>
+#include <QDebug>
+#include <QDateTime>
+
+            //文件信息类
+            QFileInfo info(filePath);
+            qDebug()<<"后缀名:"<<info.suffix().toUtf8().data()<<"大小:"<<info.size()
+                   <<"文件名:"<<info.fileName()<<"文件路径:"<<info.filePath();
+
+            qDebug()<<"创建日期"<<info.created().toString("yyyy-MM-dd hh:mm:ss")
+                   <<"最后的修改日期"<<info.lastModified().toString("yyyy/MM/dd hh:mm:ss");
+```
+
+# 快捷键
 Ctrl选中，可同时修改文本内容。
+
+# 小tips
+1.QString类型打印字符串自动带双引号，若想去除则在输出末尾加
+```c
+.toUtf8().data()
+```
