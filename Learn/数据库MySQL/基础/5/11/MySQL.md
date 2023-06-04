@@ -41,7 +41,55 @@
 修改字段名和字段类型：
 ![](${currentFileDir}/20230512144102.png)
 删除字段：
-![](${currentFileDir}/20230512144110.png)
+![](${currentFileDir}/20230512144110.#include "widget.h"
+#include <QApplication>
+#include <QSqlDatabase>
+#include <QMessageBox>
+#include <QDebug>
+#include <QSqlError>
+
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    Widget w;
+    w.show();
+
+//    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+//        db.setHostName("127.0.0.1");
+//        db.setPort(3306);
+//        db.setDatabaseName("videoplayer");
+//        db.setUserName("Chanyelo");
+//        db.setPassword("20021023ljj");
+//        bool ok = db.open();
+//        if (ok){
+//            QMessageBox::information(this, "infor", "success");
+//        }
+//        else {
+//            QMessageBox::information(this, "infor", "open failed");
+//            qDebug()<<"error open database because"<<db.lastError().text();
+//        }
+
+    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+        db.setHostName("127.0.0.1");
+        db.setPort(3306);
+        db.setDatabaseName("1");
+        db.setUserName("Chanyelo");
+        db.setPassword("20021023ljj");
+        bool ok = db.open();
+        if (ok){
+            QMessageBox::information(NULL, "infor", "success");
+        }
+        else {
+            QMessageBox::information(NULL, "infor", "open failed");
+            qDebug()<<"error open database because"<<db.lastError().text();
+        }
+
+
+
+
+    return a.exec();
+}png)
 修改表名：
 ![](${currentFileDir}/20230512144118.png)
 删除表：
