@@ -42,6 +42,8 @@
 ![](${currentFileDir}/20230512144102.png)
 删除字段：
 ![](${currentFileDir}/20230512144110.#include "widget.h"
+
+```c++
 #include <QApplication>
 #include <QSqlDatabase>
 #include <QMessageBox>
@@ -89,7 +91,8 @@ int main(int argc, char *argv[])
 
 
     return a.exec();
-}png)
+}
+```
 修改表名：
 ![](${currentFileDir}/20230512144118.png)
 删除表：
