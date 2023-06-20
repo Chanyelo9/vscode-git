@@ -86,10 +86,20 @@ int main(int argc, char *argv[])
             QMessageBox::information(NULL, "infor", "open failed");
             qDebug()<<"error open database because"<<db.lastError().text();
         }
+<<<<<<< HEAD
 return a.exec();
 }
 ```
    
+=======
+
+
+
+
+    return a.exec();
+}
+```
+>>>>>>> 0a069d6708d6fc416ef944213b1f152952926847
 修改表名：
 ![](${currentFileDir}/20230512144118.png)
 删除表：
