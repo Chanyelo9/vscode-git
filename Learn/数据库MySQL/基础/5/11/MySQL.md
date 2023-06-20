@@ -42,6 +42,8 @@
 ![](${currentFileDir}/20230512144102.png)
 删除字段：
 ![](${currentFileDir}/20230512144110.#include "widget.h"
+
+```c++
 #include <QApplication>
 #include <QSqlDatabase>
 #include <QMessageBox>
@@ -84,12 +86,10 @@ int main(int argc, char *argv[])
             QMessageBox::information(NULL, "infor", "open failed");
             qDebug()<<"error open database because"<<db.lastError().text();
         }
-
-
-
-
-    return a.exec();
-}png)
+return a.exec();
+}
+```
+   
 修改表名：
 ![](${currentFileDir}/20230512144118.png)
 删除表：
