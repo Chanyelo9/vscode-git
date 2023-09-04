@@ -86,7 +86,6 @@ int main(int argc, char *argv[])
             QMessageBox::information(NULL, "infor", "open failed");
             qDebug()<<"error open database because"<<db.lastError().text();
         }
-<<<<<<< HEAD
 return a.exec();
 }
 ```
