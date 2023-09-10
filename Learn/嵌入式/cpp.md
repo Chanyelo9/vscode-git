@@ -135,6 +135,107 @@ C++也提供了默认复制构造函数
 检查内存泄漏：new与delete配对，拷贝构造是深拷贝
 
 
+## 9.10
+1.C++之rvo和移动语义
+移动语义：抢内存，目的是减少对象的拷贝
+```c++
+//类
+demo();
+demo GetCopy()
+{
+    demo temp = *this;
+    return temp;
+}
+~demo();
+//主函数
+demo a;
+demo c = a.GetCopy();//return抢走原内存（temp）内存，原对象内存不能再使用
+
+//最后只进行两次构造析构
+```
+
+2.左值（有内存的对象）右值（只有值）
+```c++
+demo a;
+demo b = a;//=相当于拷贝，a内存给b
+```
+右值引用：把一个左值变右值
+```c++
+demo(demo&& d);//右值引用，两个&
+
+demo::demo(demo &&d)
+{
+    this->m = d.m;
+    d.m = NULL;
+    printf("move construction\n");
+}
+
+demo a;
+demo d = std::move(a);//move变右值
+```
+
+3.std::cout & std::cin 标准输入输出流
+
+4.匿名对象：作用域就一行,如demo(10)
+```c++
+//定义一个对象，想再输入值
+    demo a = demo(10);
+//结果只构造一次有参构造和析构
+```
+
+5.explicit：解决构造函数的隐式转换
+
+
+6.const三种用法：形参，返回值，函数
+（1）const对（对象，会触发移动语义）返回值没有约束：
+```c++
+const integer GetInteger()
+{
+    return *this;
+}
+```
+（2）但是const的约束力只在返回值是指针的时候有效
+```c++
+const int* GetInteger()
+{
+    return &num;
+}
+```
+（3）常函数：const在函数最后加，修饰是是函数成员（私有成员不允许修改）,故在函数内不能对类的成员修改
+```c++
+void SetNum(int a)const
+{
+    num = a;//num是私有成员，会报错
+}
+```
+
+7.运算符的重载：operator + 运算符 (符号：+ - .....)
+```c++
+//const virtualNumm& a;避免实参到形参的拷贝
+virtualNum operator+(const virtualNum& a)//c需要写两个参数，c++使用this只用写入一个
+{
+    virtualNum c(0, 0);
+    c.real = a.real + this->real;
+    c.vir = a.vir + this->vir;
+    return c;
+}
+```
+
+8.友元函数 friend 允许访问私有成员
+会破坏封装性，少用
+
+友元类
+
+友元关系是单向的。
+
+
+
+
+
+
+
+
+
 
 
 
