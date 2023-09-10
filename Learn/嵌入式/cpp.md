@@ -221,6 +221,8 @@ virtualNum operator+(const virtualNum& a)//c需要写两个参数，c++使用thi
 }
 ```
 
+重载可以直接使用运算符
+
 8.友元函数 friend 允许访问私有成员
 会破坏封装性，少用
 
@@ -229,13 +231,17 @@ virtualNum operator+(const virtualNum& a)//c需要写两个参数，c++使用thi
 友元关系是单向的。
 
 
+> void不能连续等于
+> 对象返回要多调用一次引用构造
+> 调用不需要额外
+
+![](${currentFileDir}/20230910151335.png)
+
+单独的时候使用赋值重载
+StdMyString str5 = "hhhhh"隐式转换
 
 
-
-
-
-
-
+类型运算符
 
 
 
