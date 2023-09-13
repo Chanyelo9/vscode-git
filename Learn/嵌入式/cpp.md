@@ -312,3 +312,5 @@ virtual Shape::double GetArea();
 
 
 服务器用多态
+
+指针函数相当于回调函数
