@@ -262,8 +262,9 @@ delete数组： delete []d;
 公有，私有（父类所有成员到子类全变成私有成员，保护protected（该类和继承该类的类都可以访问，父类所有成员到子类变保护成员）
 继承构造using
 
-函数遮蔽：子类和父类函数相同优先调用子类，即重写
-解决办法：调用父类
+函数遮蔽：子类和父类函数相同优先调用子类，只是重名（重定义）
+> 而重写函数名，类型，参数都要相同（重新定义和父类虚函数一模一样的函数的逻辑，函数主体）
+解决办法：调用父类 或者域解析符
 ```c++
 using Person::SetId;
 void SetId(const float& id);
@@ -298,7 +299,7 @@ s = &c;
 s->GetArea();
 ```
 3.重写虚函数:
-本类指针只能调用本类的方法，虚函数可以调用子类方法，父类加virtual，子类就不用加
+本类指针只能调用本类的方法，**虚函数可以调用子类方法**，父类加virtual，子类就不用加
 ```c++
 virtual Shape::double GetArea();
 ```
@@ -314,3 +315,174 @@ virtual Shape::double GetArea();
 服务器用多态
 
 指针函数相当于回调函数
+
+
+## 0914
+向上转型（安全）：用子类对象去构造一个父类对象（将一个子类对象给一个父类对象）
+该对象会调用父类方法
+向下转型非法
+
+Q:多态中，父类指针指向子类对象，释放父类指针只会调用父类析构，导致子类的指针成员无法释放，内存泄漏。
+解决办法：为了能调用子类的析构函数，把父类的析构函数声明为虚函数
+```c++
+A *ptrA = new B(1, 2);  
+ptrA->func();
+delete ptrA;
+```
+
+
+重载 & 重定义（函数遮蔽） & 重写
+
+
+纯虚函数:虚函数声明后面 = 0；
+特点：
+* 具有纯虚函数的类不能实例化对象，该类也称为抽象类（接口类）
+* 继承于接口类的类，如果重写纯虚函数，仍为抽象类
+* 重写*全部*纯虚函数的子类，可以实例化
+作用：定义接口标准
+
+计算立体图形的体积
+
+不清楚类型可以用const char* type
+Sort *CreateMySort(int type);变成Sort *CreateMySort(const char* type);
+
+* 封装库：
+![](${currentFileDir}/20230914104146.png)
+
+封装动态库：在封装文件所在文件夹上打开终端
+g++ -shared -fPIC StdMyString.cpp -o libStdMyString.so
+sudo cp libStdMyString.so /usr/lib
+sudo cp libStdMyString.h /usr/include
+
+程序运行指令（多加-lStdMyString）：g++ sort.cpp -o sort -lStdMyString
+
+
+Makefile伪命令
+
+
+switch只对整型有效
+
+本地化文件配置：不用修改代码
+
+* 类的内存分布:
+![](${currentFileDir}/20230914112925.png)
+
+成员变量依旧遵循内存对齐和（struct相同），成员函数不占有类的内存
+static被所有类的对象共享，所以不占用内存
+const虽然是在表里查找，但还是占用内存，const相当于常量
+
+class继承关系和struct的嵌套规则一样。
+
+子类的对象中，先放父类成员，再放子类成员。
+虚函数的实现方式：在对象内存中塞入虚函数指针，塞在对象的开头。
+所有派生类只有一个
+
+多态实现的原因：虚函数中含有虚函数指针，虚函数指针指向虚函数表。
+虚函数表只有一个。
+多个虚函数一个指针就够了。
+
+
+虚函数占8个字节
+
+虚继承的继承方式：虚继承指针 虚继承表
+每多一次虚继承，多一个虚继承指针
+
+带虚函数，带虚继承的实现方式
+
+虚继承的内存顺序：虚函数指针 虚函数成员 虚继承指针 虚继承的成员
+
+![](${currentFileDir}/20230914135834.png)
+
+![](${currentFileDir}/20230914140208.png)
+跟构造一样，父类在最后面
+
+```c++
+解决以下代码出现 warning: format ‘%x’ expects argument of type ‘unsigned int’, but argument 2 has type ‘C*’ [-Wformat=]的原因
+#include <iostream>
+using namespace std;
+
+class A
+{
+public:
+    virtual void func(){}
+    static void func2(){}
+
+    // static int m_c;
+    int m_a;
+    // char m_b;
+};
+
+class B:virtual public A
+{
+public:
+    virtual void fun3(){}
+    int m_b;
+};
+
+class C:public B
+{
+public:
+    int m_c;
+};
+
+int main()
+{
+    // cout<<sizeof(B)<<endl;
+    // printf("m_a:%x m_b%x m_%x\n", &B::m_a, &B::m_b, &B::m_d);
+
+    C c;
+    cout<<sizeof(c)<<endl;
+    printf("%x %x %x %x\n",&c, &c.m_a, &c.m_b, &c.m_c);
+
+    return 0;
+}
+```
+
+4种数据类型的转换方式
+1.static_cast：静态转换：C语言的强制类型转换的替代品
+* 基本数据类型的转换，基本数据类型的指针不能转
+* 继承关系间的向上转型，无关系的类不能转换
+* 可以用于void*（万能指针）和普通指针之间的转换
+2.dynamic_cast
+* 含有虚函数的父子之间转换
+* 向下转型时如果非法，返回空指针nullptr
+3.const_cast
+const与非const之间的转换
+```c++
+int s = 10;
+const int *a = &s;
+int *b = const_cast<int*>(a);
+*b = 20;
+cout<<s<<endl;
+```
+4.reinterpret_cast重定义转换
+
+
+泛型编程： 
+模板：
+1.当模板函数遇上普通函数的时候，优先调用普通函数。
+add<int>(1, 2); 模板的显示调用
+add(1, 2)；隐式调用
+2.当模板函数能有更好的匹配时，优先选择模板。
+3.普通函数有自动类型转换机制，模板没有，必须参数严格匹配。
+
+显示的具体化：
+template<> void Swap<Person>(Person& a, Person& b)
+显示具体化优先于模板使用
+
+类模板：
+类模板的成员函数在类外定义时要当成函数模板去写，要显示声明函数模板类型：
+TemplateClass<T>::TemplateClass(T a)
+
+TemplateClass<int> a(10);显示指定类模板的类型
+
+模板函数和模板类的定义都只能在头文件里。
+
+重载了就不需要回调
+
+typename:告诉编译器 T::Node是一个类型名，而不是一个静态成员变量
+
+**移动语义**，右值构造
+//StdMyString(const StdMyString&& str);
+
+模板动态数组、模板栈、模板队列、模板数：模板通用树，模板平衡排序二叉树
