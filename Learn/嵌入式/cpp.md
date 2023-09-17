@@ -321,7 +321,8 @@ virtual Shape::double GetArea();
 向上转型（安全）：用子类对象去构造一个父类对象（将一个子类对象给一个父类对象）
 该对象会调用父类方法
 向下转型非法
-
+//基类指针只会调用基类析构，不会调用子类析构
+//父类指针调用子类析构：多态
 Q:多态中，父类指针指向子类对象，释放父类指针只会调用父类析构，导致子类的指针成员无法释放，内存泄漏。
 解决办法：为了能调用子类的析构函数，把父类的析构函数声明为虚函数
 ```c++
@@ -397,7 +398,7 @@ class继承关系和struct的嵌套规则一样。
 跟构造一样，父类在最后面
 
 ```c++
-解决以下代码出现 warning: format ‘%x’ expects argument of type ‘unsigned int’, but argument 2 has type ‘C*’ [-Wformat=]的原因
+//解决以下代码出现 warning: format ‘%x’ expects argument of type ‘unsigned int’, but argument 2 has type ‘C*’ [-Wformat=]的原因
 #include <iostream>
 using namespace std;
 
@@ -486,3 +487,92 @@ typename:告诉编译器 T::Node是一个类型名，而不是一个静态成员
 //StdMyString(const StdMyString&& str);
 
 模板动态数组、模板栈、模板队列、模板数：模板通用树，模板平衡排序二叉树
+
+
+## 0917
+模板类的友元函数：友元函数的友元声明是不会共享类模板的声明的；
+友元函数的声明模板变量的类型不能和类模板重名。
+
+模板类的全特化：将一个类模板的所有模板变量都进行特殊化。
+template<>
+class Test<int, int>
+类模板遇上全特化，优先调用全特化
+
+模板类的偏特化：将一个类模板的部分模板变量进行特殊化
+当类模板遇上偏特化，优先调用偏特化
+template<typename T2>//模板函数的重载，不是偏特化，偏特化要再加一个int
+即templ阿特《typename T2，int>
+
+函数模板不需要偏特化，用重载函数可以实现对应的需求功能
+
+STL：标准模板库
+六大组件：容器、算法、迭代器、仿函数、适配器、空间适配器
+
+vector:单端动态数组，连续空间
+
+3种初始化：
+```c++
+//数组初始化
+std::vector<int> a(arr,arr+5);
+//迭代器初始化
+std::vector<int> b(a.begin(), a.begin()+5);
+//拷贝初始化
+vector<int> c(b);
+for(auto&value : b)
+{
+    cout<<" "<<endl;
+}
+```
+
+base range for 
+
+vector:[]：vector重载的中括号不会进行越界检测
+       at：会抛出越界异常
+
+vector的缺点
+
+a.emplace_back(StdMyString("world"));//移动语义，减少对象的拷贝，谨慎使用不然内存出错
+
+deque：很少用，双端动态数组，非连续数组，指针数组
+用构造的代价换来复杂的空间计算
+用vector不能满足头部操作的优化换来更大代价
+
+list：双向链表
+list 由链表组成，不能随机读取，不能一次跨越两个
+强大在随机存取，插入删除强
+
+capacity容器扩容
+
+vector<char>自带扩容重载
+
+c++在Linux和wins上编码方式不同
+wins上是GBK Linux上是UTF-8
+
+在线聊天室
+
+
+## 开源C++库的综合列表：
+Redis
+boost库：HTTP，Websocket
+异端HTTP客户端库
+QT库
+release-OpenCV
+
+set：排序容器，值唯一
+底层结构：平衡二叉树之红黑树
+
+lower_bound(value)：输出数列中第一个大于等于Value的值的迭代器
+upper_bound(value)：输出数列中第一个大于Value的值
+
+pair对组:
+
+迭代器auto:
+vector<pair<string, bool>>::iterator it = v.begin();
+auto it2 = v.begin();//代替上面繁冗代码
+
+map容器：键值对列表 key,value
+map[] = ;存在则更新数据，可以直接修改值
+map.insert();存在键值则无视，不能修改值
+insert_or_assign:插入或更新
+
+## 下载boost库
