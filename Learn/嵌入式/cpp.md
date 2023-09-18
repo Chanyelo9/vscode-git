@@ -533,7 +533,33 @@ vector:[]：vector重载的中括号不会进行越界检测
 
 vector的缺点
 
-a.emplace_back(StdMyString("world"));//移动语义，减少对象的拷贝，谨慎使用不然内存出错
+* emplace_back & psuh_back
+a.emplace_back(StdMyString("world"));//移动语义，减少对象的拷贝，谨慎使用不然内存出错。
+内存优化上：采用了就地构造（直接在容器内构造对象，不用拷贝一个复制品再使用）+强制类型转换。
+效率上：省去拷贝构造
+
+```c++
+1.没有重载中括号就不能使用，a.size()的size是每次都要计算的
+    for(int i = 0;i < a.size();i++)
+    {
+        std::cout<<a[i]<<" ";
+    }
+    std::cout<<std::endl;
+2.迭代器访问，只要容器支持迭代器就可以使用（所有迭代器都支持）
+    auto ite = a.begin();
+    for(auto ite = a.begin();ite != a.end();ite++);//迭代器
+    {
+        std::cout<<*ite<<" ";
+    }
+    std::cout<<*a.begin()<<std::endl;
+    std::cout<<*a.end()<<std::endl;
+    std::cout<<std::endl;
+3.访问速度最快，但无法计算个数，不知道下标和前后的值，最多返回当前值的引用
+    for(auto&value : a)
+    {
+        std::cout<<value<<" ";
+    }
+```
 
 （2）deque：很少用，双端动态数组，非连续数组，指针数组
 用构造的代价换来复杂的空间计算
@@ -552,8 +578,12 @@ list没有重载下标[]
     cout<<*it2;
   ```
 
-lis优势：即它可以在序列已知的任何位置快速插入或删除元素 **（时间复杂度为O(1)）**。并且在 list 容器中**移动元素**，也比其它容器的效率高。
+list优势：即它可以在序列已知的任何位置快速插入或删除元素 **（时间复杂度为O(1)）**。并且在 list 容器中**移动元素**，也比其它容器的效率高。
 list缺点：它不能像 array 和 vector 那样，通过位置**直接访问元素**。举个例子，如果要访问 list 容器中的第 6 个元素，它不支持容器对象名[6]这种语法格式，正确的做法是从容器中第一个元素或最后一个元素开始**遍历**容器，直到找到该位置。
+
+forward_list是C++11引入的新容器之一。它的底层是单向链表，引入它的主要目的是为了达到手写链表的性能。同时节省了部分内存空间。（只有一根指针）。
+![](${currentFileDir}/20230918195838.png)
+
 
 capacity容器扩容
 
@@ -584,9 +614,34 @@ upper_bound(value)：输出数列中第一个大于Value的值
 vector<pair<string, bool>>::iterator it = v.begin();
 auto it2 = v.begin();//代替上面繁冗代码
 
-map容器：键值对列表 key,value
+(6)map容器：键值对列表 key,value
 map[] = ;存在则更新数据，可以直接修改值
 map.insert();存在键值则无视，不能修改值
 insert_or_assign:插入或更新
+
+利用operator()，可以根据大小排序
+```c++
+class Person
+{
+    public:
+    string m_name;
+    int m_age;
+    Person(string name, int age)
+    {
+        m_name = name;
+        m_age = age;
+    }
+}
+class myComparePerson
+{
+    public:
+    bool operator()(const Person &p1, const Person &p2) const//const可以修饰类成员函数
+    {
+        return p1.m_age>p2.m_age;
+    }
+};
+//main
+set<Person, myComparePerson> s;
+```
 
 ## 下载boost库
