@@ -501,14 +501,16 @@ class Test<int, int>
 模板类的偏特化：将一个类模板的部分模板变量进行特殊化
 当类模板遇上偏特化，优先调用偏特化
 template<typename T2>//模板函数的重载，不是偏特化，偏特化要再加一个int
-即templ阿特《typename T2，int>
+即template<typename T2，int>
 
 函数模板不需要偏特化，用重载函数可以实现对应的需求功能
 
 STL：标准模板库
 六大组件：容器、算法、迭代器、仿函数、适配器、空间适配器
+不同容器的迭代器：
+![](${currentFileDir}/20230918164339.png)
 
-vector:单端动态数组，连续空间
+（1）vector:单端动态数组，连续空间
 
 3种初始化：
 ```c++
@@ -533,13 +535,25 @@ vector的缺点
 
 a.emplace_back(StdMyString("world"));//移动语义，减少对象的拷贝，谨慎使用不然内存出错
 
-deque：很少用，双端动态数组，非连续数组，指针数组
+（2）deque：很少用，双端动态数组，非连续数组，指针数组
 用构造的代价换来复杂的空间计算
 用vector不能满足头部操作的优化换来更大代价
 
-list：双向链表
+（3）list：双向链表
 list 由链表组成，不能随机读取，不能一次跨越两个
 强大在随机存取，插入删除强
+list迭代器不能+1
+list没有重载下标[]
+
+* std::list是顺序容器，但不是随机访问容器（仅有std::vector，C数组和c++11中的std::array是），可以从两端顺序访问，所以其迭代器只支持++和–这种双向的链式操作（c++11中的slist则只支持++）。如果想一次移动多个位置，也可以使用里的advance函数:
+* ```c++
+    auto it2 = list.begin();
+    advance(it2, 2);
+    cout<<*it2;
+  ```
+
+lis优势：即它可以在序列已知的任何位置快速插入或删除元素 **（时间复杂度为O(1)）**。并且在 list 容器中**移动元素**，也比其它容器的效率高。
+list缺点：它不能像 array 和 vector 那样，通过位置**直接访问元素**。举个例子，如果要访问 list 容器中的第 6 个元素，它不支持容器对象名[6]这种语法格式，正确的做法是从容器中第一个元素或最后一个元素开始**遍历**容器，直到找到该位置。
 
 capacity容器扩容
 
@@ -558,13 +572,13 @@ boost库：HTTP，Websocket
 QT库
 release-OpenCV
 
-set：排序容器，值唯一
+(4)set：排序容器，值唯一
 底层结构：平衡二叉树之红黑树
 
 lower_bound(value)：输出数列中第一个大于等于Value的值的迭代器
 upper_bound(value)：输出数列中第一个大于Value的值
 
-pair对组:
+(5)pair对组:
 
 迭代器auto:
 vector<pair<string, bool>>::iterator it = v.begin();
