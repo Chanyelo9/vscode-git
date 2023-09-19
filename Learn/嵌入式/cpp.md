@@ -644,4 +644,141 @@ class myComparePerson
 set<Person, myComparePerson> s;
 ```
 
-## 下载boost库
+
+
+## 0919
+map 不能随便插入顺序，是要可以小于号比较的数值类型。字符串要**重载小于号**
+
+tuple：元组容器，返回值有多个类型
+make_tuple
+```c++
+tuple<int, double, std::string> t(1, 1.2, "hh");
+auto t = make_tuple(1, 1.2, "hh");//优化，代价可读性下降
+//tie 捆绑
+std::tie(myint, mydouble, std::ignore) = t;
+//可以用get取值：
+get<0>(t)
+```
+
+any：万能匹配
+any_cast转换类型不匹配，直接段错误
+解决：
+1）RTTI：运行时类型信息 void*
+typeid：返回类型信息
+
+野指针访问：内存已释放
+异常处理:异常三个部分：抛出异常throw，检测异常try，捕获异常
+try 尝试运行
+{
+
+}
+catch 捕获异常
+{
+
+}
+
+栈的解旋：在异常抛出后，被捕获之前，释放掉栈上的所有对象
+
+体系：纯虚函数->继承->多态
+
+多态:引用（本质：指针对象）和父类指针指向子类对象
+
+![](${currentFileDir}/20230919140512.png)
+
+适配器：栈和队列，没有迭代器
+栈要先取出栈元素，再抛出
+
+约瑟夫环：队列，链表
+
+临时对象就是匿名对象
+
+算法库
+函数对象（仿函数）：重载了（）的类
+
+lambda表达式：匿名函数对象  适用于短小精悍代码
+[]：捕获列表：捕获上文的变量和参数
+变量名：捕获变量的值(右值，不能修改，修改要使用引用)
+&变量名：捕获变量的引用
+[&]：所有变量以引用形式进行捕获
+[=]：所有变量以值的形式进行捕获
+
+不能重复捕获
+
+自动推导返回值类型,->表明返回类型
+auto function = [&](int a, int b)->int{}
+
+算法库
+```c++
+class Test1
+{
+public:
+    void operator()(const int &a)
+    {
+        std::cout<<a<<std::endl;
+    }
+
+};
+
+void Print(const int &x)
+{
+    std::cout<<x<<std::endl;
+}
+//main
+std::vector<int> vec = {1, 2, 3, 4, 5, 6};
+//三种表示方法
+std::for_each(vec.begin(), vec.end(), Print);//一行遍历
+std::for_each(vec.begin(), vec.end(), [](const int& x)       
+        {std::cout<<x<<std::endl;});//一行遍历
+std::for_each(vec.begin(), vec.end(), Test1());//一行遍历
+```
+
+回调三种方法：普通函数指针、函数对象、lambda表达式
+
+vector:
+reserve：预留空间，不构建对象，插入insert放入数据
+resize：创建空间，构建对象
+
+stable_partition：稳定版本，保存数列的原来的相对位置
+partition：不稳定版本
+
+? remove_if max
+
+迭代器的使用：
+迭代器失效的时机：（把迭代器当指针）
+1.尾插：不一定导致迭代器失效。对于vector：重新分配空间，所有迭代器失效；不重新分配空间，除end外其他迭代器正常。那list呢，只要不动头，头部就不失效
+![](${currentFileDir}/20230919193220.png)
+
+2.中间插：
+![](${currentFileDir}/20230919193337.png)
+
+multiset和multimap：有序，允许重复的值
+
+map红黑树
+unordered_map：无序 ，底层由哈希表实现
+
+function函数包装器
+
+成员与对象，只有绑定了成员才能使用
+静态成员函数没有this指针，无需指针可以调用。其他需指针
+
+bind绑定函数 ：（不带std的是在Tcp接口中使用）将一个函数和参数进行绑定，生成一个新的函数对象（改变函数的结构），该对象可以直接调用，但会自动填充参数。可以用于绑定成员函数
+
+std::placeholders::_1：占位符，函数调用时，参数会被自动填充到相应位置
+
+C++ 内存管理
+谁申请谁释放：类的内部而已
+
+智能指针：管理堆上空间
+* shared_ptr：共享指针。
+（1）不要用原始指针去初始化智能指针，当原始指针去初始化智能指针，智能指针默认独占原始指针，当拷贝智能指针时，会造成错误。
+（2）循环引用
+* unique_ptr：独占指针，独占一块内存，会自动释放。独占体现在拷贝构造被删除，赋值运算符重载函数被删除
+* weak_ptr：解决循环引用问题。指向shared_ptr的内存不会让引用计数器加1
+
+内存自动释放原因：
+含有引用计数器：计算智能指针指向内存的个数。
+当没有指针指向内存，内存自动释放
+
+一旦使用智能指针，就不要用裸指针
+
+sudo apt-get update
