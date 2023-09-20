@@ -647,9 +647,9 @@ set<Person, myComparePerson> s;
 
 
 ## 0919
-map 不能随便插入顺序，是要可以小于号比较的数值类型。字符串要**重载小于号**
+### 1.map 不能随便插入顺序，是要可以小于号比较的数值类型。字符串要**重载小于号**
 
-tuple：元组容器，返回值有多个类型
+### 2.tuple：元组容器，返回值有多个类型
 make_tuple
 ```c++
 tuple<int, double, std::string> t(1, 1.2, "hh");
@@ -660,11 +660,19 @@ std::tie(myint, mydouble, std::ignore) = t;
 get<0>(t)
 ```
 
-any：万能匹配
+### 3.any：万能匹配
 any_cast转换类型不匹配，直接段错误
 解决：
-1）RTTI：运行时类型信息 void*
-typeid：返回类型信息
+使用RTTI：运行时类型信息 void*
+1）typeid：返回类型信息
+```c++
+// 判断pg指向的是否是ClassName类的对象
+typeid(ClassName) == typeid(*pg)
+```
+2）type_info
+补充：any可以表示任意类型，所以用不了多态，因为没有统一的接口
+any优点：存放类型本身（无需存放指针而担心内存指向内容的生存），可以存放任何类型。
+any缺点：用不了多态，用不了统一接口
 
 野指针访问：内存已释放
 异常处理:异常三个部分：抛出异常throw，检测异常try，捕获异常
@@ -678,6 +686,7 @@ catch 捕获异常
 }
 
 栈的解旋：在异常抛出后，被捕获之前，释放掉栈上的所有对象
+堆呢
 
 体系：纯虚函数->继承->多态
 
@@ -781,4 +790,6 @@ C++ 内存管理
 
 一旦使用智能指针，就不要用裸指针
 
-sudo apt-get update
+libevent 
+
+h文件封装：sudo cp CSTL.h /usr/include/
