@@ -260,7 +260,7 @@ delete数组： delete []d;
 
 继承：**代码复用**
 公有，私有（父类所有成员到子类全变成私有成员，保护protected（该类和继承该类的类都可以访问，父类所有成员到子类变保护成员）
-继承构造using
+继承构造using：调用父类或者直接使用父类的构造函数
 
 函数遮蔽：子类和父类函数相同优先调用子类，只是重名（重定义）
 > 而重写函数名，类型，参数都要相同（重新定义和父类虚函数一模一样的函数的逻辑，函数主体）
@@ -766,13 +766,53 @@ map红黑树
 unordered_map：无序 ，底层由哈希表实现
 
 function函数包装器
+```c++
+void func(int a, int b)
+{
+    std::cout<<"a = "<<a<<", b = "<<b<<std::endl;
+}
+
+std::function<void(int, int)> f = func;
+```
 
 成员与对象，只有绑定了成员才能使用
-静态成员函数没有this指针，无需指针可以调用。其他需指针
+static静态成员函数没有this指针，无需指针可以调用。其他需指针
+```c++
+class Test
+{
+public:
+    void operator()(int a, int b)
+    {
+        std::cout<<"a = "<<a<<", b = "<<b<<std::endl;
+    }
 
-bind绑定函数 ：（不带std的是在Tcp接口中使用）将一个函数和参数进行绑定，生成一个新的函数对象（改变函数的结构），该对象可以直接调用，但会自动填充参数。可以用于绑定成员函数
+    static void func1(int a, int b)
+    {
+        std::cout<<"a = "<<a<<", b = "<<b<<std::endl;
+    }
+};
+std::function<void(int, int)> f = &Test::func1;
+```
 
+多种方法：
+```c++
+std::function<void(int, int)> f = func;
+
+std::function<void(int, int)> f = Test();
+std::function<void(int, int)> f = &Test::func1;
+
+std::function<void(int, int)> f = [](int a, int b){
+    std::cout<<"a = "<<a<<", b = "<<b<<std::endl;
+};
+```
+
+bind绑定函数 ：（不带std的是在Tcp接口中使用）将一个函数和参数进行绑定，生成一个新的函数对象（改变函数的结构），该对象可以直接调用，但会自动填充参数。可以用于绑定成员函数。
 std::placeholders::_1：占位符，函数调用时，参数会被自动填充到相应位置
+```c++
+auto f = std::bind(&Test::func2, &t, std::placeholders::_1, std::placeholders::_2);
+auto f1 = std::bind(&Test::func2, &t, 100, std::placeholders::_2);
+f1(1, 2);
+```
 
 C++ 内存管理
 谁申请谁释放：类的内部而已
@@ -781,8 +821,39 @@ C++ 内存管理
 * shared_ptr：共享指针。
 （1）不要用原始指针去初始化智能指针，当原始指针去初始化智能指针，智能指针默认独占原始指针，当拷贝智能指针时，会造成错误。
 （2）循环引用
+```c++
+std::shared_ptr<Test> p3(new Test);//官方初始化方式
+p3->func();
+//推荐以下初始化方式
+// std::shared_ptr<Test> p4 = std::make_shared<Test>();
+```
+use_count()：返回管理当前对象的不同 shared_ptr 实例（包含 this ）数量。若无管理对象，则返回 ​0​ 
 * unique_ptr：独占指针，独占一块内存，会自动释放。独占体现在拷贝构造被删除，赋值运算符重载函数被删除
-* weak_ptr：解决循环引用问题。指向shared_ptr的内存不会让引用计数器加1
+  ```c++
+  //以下皆无法实现
+  //拷贝
+  std::unique_ptr<Test> p1;
+  Test *p = new Test;
+  std::unique_ptr<Test> p1(p);
+  //重载
+  std::unique_ptr<Test> p1;
+  //p1 = p;赋值运算符重载函数被删除
+  ```
+
+  std::unique_ptr<Test> p1(p.get()); get是取出原始指针
+  std::unique_ptr<Test> p2 = std::move(p);拥有独占的所有权，不能简单地将其复制给另一个独占指针。只能通过移动语义来转移所有权。
+
+* weak_ptr：解决循环引用问题。指向shared_ptr的内存不会让引用计数器加1 ??不懂
+
+
+move：左值强转右值，节省空间，为性能而生。
+移动语义，允许直接转移对象的资产和属性的所有权，而在参数为右值时无需复制它们。
+换一种说法就是，std::move() 将对象的状态或者所有权从一个对象转移到另一个对象，只是转移，没有内存的搬迁或者内存拷贝。
+左值右值基本语法：
+左值引用的基本语法：type &引用名 = 左值表达式；
+右值引用的基本语法type &&引用名 = 右值表达式；
+举例：
+C++ 标准库使用比如vector::push_back 等这类函数时,会对参数的对象进行复制,连数据也会复制.这就会造成对象内存的额外创建, 本来原意是想把参数push_back进去就行了,通过std::move，可以避免不必要的拷贝操作。
 
 内存自动释放原因：
 含有引用计数器：计算智能指针指向内存的个数。
@@ -793,3 +864,235 @@ C++ 内存管理
 libevent 
 
 h文件封装：sudo cp CSTL.h /usr/include/
+
+
+## 0921
+池化技术：减少系统调用的次数，减少进程的删减，提高程序性能
+
+重载关键字new、delete
+malloc、free
+```c++
+void* operator new(size_t size)
+{
+    std::cout << "operator new" << std::endl;
+    return malloc(size);
+}
+
+void operator delete(void* p)
+{
+    std::cout<<"operator delete"<<std::endl;
+    free(p);
+}
+```
+
+防止一个对象在堆上被创建？
+重载new私有化
+
+new全局重载
+
+重载new的重载：
+```c++
+void* operator new(size_t size, int a)//重载new的重载
+{
+    std::cout << "operator new" << std::endl;
+    std::cout<<a<<std::endl;
+    return malloc(size);
+}
+
+double *b = new(1) double(1.2);
+delete b;
+```
+
+```c++
+void* operator new(size_t size, char* p)//重载new的重载
+{
+    std::cout << "operator new" << std::endl;
+    std::cout<<"cz"<<std::endl;
+    return p;
+}
+
+char str[4] = {0};
+int *a = new(str) int(2);//定位new，可以把new的对象指向（映射）到特定空间，a指向str的空间（大小为4
+printf("str:%x a:%x\n", str, a);
+std::cout<<*a<<std::endl;
+```
+
+对c来说，int和char的区别就是内存大小的区别
+
+### 内存池：核心：重载new和delete，减少new和delete
+无法通过内存池避免内存碎片问题
+
+需要两条链表，内存块里的结点（小内存块）之间，内存块之间
+![](${currentFileDir}/20230921102144.png)
+
+头插
+```c++
+newBlock->next = memBlockHead;
+        memBlockHead = newBlock;
+```
+![](${currentFileDir}/20230921104153.png)
+
+
+* 享元
+* 进程、线程信号量
+
+static int count;static最好用法：数数
+
+嵌入式指针：
+```c++
+//共用体替代结构体，高阶写法，不占用空间，不过仅限内存池
+union FreeNode
+{
+    char data[Node_Size];//可以随意指定字节大小
+    FreeNode *next;
+};
+```
+
+数组连续空间
+
+伙伴算法：11页 
+
+内存管理技术：new、智能指针、内存池
+检测内存泄漏：内存池，编译器自带
+
+vtune profile
+
+stlfile.h
+
+auto decltype
+auto推导会忽略引用类型和前面的修饰关键字，decltype不会
+![](${currentFileDir}/20230921141643.png)
+
+decltype推导右值是普通类型，推导左值是引用类型
+```c++
+int a = 1;
+int b = 2;
+decltype(a+b) c = 0;//int是左值
+decltype(a+=b) d = c;//返回a,是右值
+```
+
+decltype用于模板
+返回值后置：不确定返回值类型，返回值依赖列表形参类别，放到前面无法识别，所以需后置
+```c++
+template<typename T1, typename T2>
+// decltype(a + b) func(T1 a, T2 b)
+auto func(T1 a, T2 b)->decltype(a + b){}
+```
+
+函数包装器
+
+并发
+
+#include <iostream>
+#include <thread>
+
+int main()
+{
+    auto func = []()
+    {
+        for(int i = 0; i < 100; i ++)
+        {
+            std::cout<<i<<std::endl;
+        }
+    };
+    std::thread t1(func);
+
+    //t1.join();
+    //分离前判断是否可以回收，已回收的不能再回收
+    if(t1.joinable())
+    {
+        t1.detach();        
+    }
+
+
+    auto func2 = []()
+    {
+        for(int i = 0; i < 25; i ++)
+        {
+            std::cout<<(char)(i + 'a')<<std::endl;
+        }
+    };
+    std::thread t2(func2);
+
+    t1.join();
+    t2.join();
+
+    return 0;
+}
+
+快排
+
+线程间是竞争关系
+
+死锁
+std::lock 锁的封装：动态的释放锁
+std::lock_guard<std::mutex> 把锁在构造函数里面上锁。在析构时解锁
+
+
+原子类型：原子变量不需要加锁，保证线程安全
+std::atomic<int>
+原子变量：atomic和线程
+多线程访问处理时，原子变量更新是及时的
+对象有指针指向另一个内存，最好不要使用，不能保证另一个内存是否改变
+
+临界值
+
+线程安全的处理方式：锁（补充lock_guard） 信号量  临界值变为atomic
+
+async：异步线程函数
+std::launch::async；异步启动
+std::launch::deferred；延时启动：同步任务，没有启用新的线程
+好处：
+```c++
+int mythread()
+{
+    std::cout<<std::this_thread::get_id()<<std::endl;
+    sleep(3);
+    return 10;
+}
+//异步启动
+auto f = std::async(std::launch::async, mythread);
+std::cout<<std::this_thread::get_id()<<std::endl;
+std::cout<<f.get()<<std::endl;//get会阻塞，等待异步任务
+
+//延时启动， 是在get函数里启动任务，遇到get才启动
+auto f1 = std::async(std::launch::deferred, mythread);
+std::cout<<std::this_thread::get_id()<<std::endl;
+std::cout<<f1.get()<<std::endl;//get会阻塞，等待异步任务
+```
+返回值：![](${currentFileDir}/20230921163533.png)
+
+std::launch::deferred | std::launch::async 启动策略：可以异步启动就异步执行，系统资源无法启动新线程时，使用同步任务。
+
+![](${currentFileDir}/20230921164239.png)
+
+同步、异步的区别：
+同步不要出现临界值
+
+base range for:for(auto &i : map)
+
+final：修饰的类不能被继承，修饰的类是最终类。
+default：声明函数是默认构造函数      A() = default;
+delete：拷贝构造不被允许
+```c++
+A(const A&a) = delete;
+void* operator new(size_t size) = delete;
+
+A a;
+A b(a);
+A *c = new A;//不允许对象在堆上创建
+```
+
+enum class防止跨越做等值匹配
+
+c++11特性：以上
+
+c++14特性：
+auto自动推导返回类型
+auto func(auto i)//c++20可以推导形参列表
+
+变量模板：
+别名模板：
+
+quoted：加双引号
+头文件iomanip
