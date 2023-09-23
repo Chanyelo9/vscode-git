@@ -76,7 +76,7 @@ student::student(const char *name, int age):grade(16),age(age)
 在类里用static定义变量，则变量属于整个类，不独属于某一个类的对象
 
 静态成员函数：
-该函数可直接调用，不需要对象调用，不属于某一特定对象。也没有this指针，也不能访问非静态成员变量
+该函数可直接调用，不需要对象调用，不属于某一特定对象。也**没有this指针**，也不能访问非静态成员变量
 ```c++
 //h
 void static func();
@@ -184,6 +184,14 @@ demo d = std::move(a);//move变右值
 ```
 
 5.explicit：解决构造函数的隐式转换
+```c++
+explicit Integer(int a){}
+
+integer a(10);
+cout<<a.GetInteger()<<endl;
+a = (20); //等于a = integer(a); 默认转换成匿名对象， 没有匹配符号在类外是不被允许的，故引用explicit
+cout<<a.GetInteger()<<endl;
+```
 
 
 6.const三种用法：形参，返回值，函数
@@ -661,6 +669,7 @@ get<0>(t)
 ```
 
 ### 3.any：万能匹配
+可以把任意类型的数据放在any中，用的时候再any_cast出类型
 any_cast转换类型不匹配，直接段错误
 解决：
 使用RTTI：运行时类型信息 void*
@@ -825,7 +834,7 @@ C++ 内存管理
 std::shared_ptr<Test> p3(new Test);//官方初始化方式
 p3->func();
 //推荐以下初始化方式
-// std::shared_ptr<Test> p4 = std::make_shared<Test>();
+std::shared_ptr<Test> p4 = std::make_shared<Test>();
 ```
 use_count()：返回管理当前对象的不同 shared_ptr 实例（包含 this ）数量。若无管理对象，则返回 ​0​ 
 * unique_ptr：独占指针，独占一块内存，会自动释放。独占体现在拷贝构造被删除，赋值运算符重载函数被删除
@@ -928,7 +937,7 @@ std::cout<<*a<<std::endl;
 头插
 ```c++
 newBlock->next = memBlockHead;
-        memBlockHead = newBlock;
+memBlockHead = newBlock;
 ```
 ![](${currentFileDir}/20230921104153.png)
 
@@ -1096,3 +1105,5 @@ auto func(auto i)//c++20可以推导形参列表
 
 quoted：加双引号
 头文件iomanip
+
+excel解析库
