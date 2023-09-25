@@ -262,8 +262,20 @@ delete数组： delete []d;
 
 就地构造:
 在调用构造函数开始时先调用就地构造.
+```c++
+class Line: public Point
+{
+private:
+    Point end{0, 0};//就地构造
+    Point start{0, 0};
+}
+```
 委托构造：
-在构造函数的初始化列表中调用别的构造函数。
+在构造函数的**初始化列表**中调用别的构造函数。
+```c++
+Line(int x1, int y1, int x2, int y2):Point(x1, y1), end(Point(x2, y2)){}
+Line(int x1, int y1, int x2, int y2):start(x1, y1), end(x2, y2){}
+```
 顺序：就地 > 委托 > 自己
 
 继承：**代码复用**
@@ -287,17 +299,29 @@ void SetId(const float& id);
 
 **代码复用**：组合
 把一个类的对象当成另一个对象的成员变量
+```c++
+class Rectangle:public Shape//组合
+{
+public:
+    Rectangle(const Line& line1, const Line& line2):m_length(line1), m_width(line2){}//简洁，两个点两个线
+    //Rectangle(const Line& line1, const Line& line2):Line(line1), m_endLine(line2){}//两个点（x,y),p一个线line
+    double GetArea() override;
+private:
+    Line m_width;
+    Line m_length;
+}
+```
 
 计算图形面积
 圆适合用继承：只需一个点
 长方形更适合组合：
 
-
+派生类无法重载基类的成员函数，如函数遮蔽，基类被屏蔽
 
 多态：一个接口，多种状态
 接口复用：就是函数复用
 1.c++在父子类之间允许类型转换，有继承关系
-2.父类指针指向子类对象
+2.父类指针指向子类对象，（通过指针调用派生类对象的虚函数）
 > 指针是8个字节，智能指针能指向任何字节的对象
 ```c++
 //用父类指针指向子类对象，调用子类的接口
@@ -307,6 +331,10 @@ s = &c;
 s->GetArea();
 ```
 3.重写虚函数:
+基类的指针只能访问从基类继承的成员，不能访问派生类新增的成员。
+
+在构造函数中调用虚函数是无法实现多态的。
+
 本类指针只能调用本类的方法，**虚函数可以调用子类方法**，父类加virtual，子类就不用加
 ```c++
 virtual Shape::double GetArea();
@@ -332,7 +360,7 @@ virtual Shape::double GetArea();
 //基类指针只会调用基类析构，不会调用子类析构
 //父类指针调用子类析构：多态
 Q:多态中，父类指针指向子类对象，释放父类指针只会调用父类析构，导致子类的指针成员无法释放，内存泄漏。
-解决办法：为了能调用子类的析构函数，把父类的析构函数声明为虚函数
+解决办法：**为了能调用子类的析构函数，把父类的析构函数声明为虚函数**
 ```c++
 A *ptrA = new B(1, 2);  
 ptrA->func();
