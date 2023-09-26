@@ -375,7 +375,7 @@ delete ptrA;
 特点：
 * 具有纯虚函数的类不能实例化对象，该类也称为抽象类（接口类）
 * 继承于接口类的类，如果重写纯虚函数，仍为抽象类
-* 重写*全部*纯虚函数的子类，可以实例化
+* 重写**全部**纯虚函数的子类，可以实例化
 作用：定义接口标准
 
 计算立体图形的体积
@@ -1135,3 +1135,91 @@ quoted：加双引号
 头文件iomanip
 
 excel解析库
+
+
+## 0926
+万能引用：&&，只在模板里万能。左值右值引用都能使用。注意不是右值引用
+引用折叠：A && && = A &&
+         A & && = A &
+完美转发：解决参数传递时右值属性变成左值的问题
+```c++
+class Test
+{
+private:
+    std::string name;
+
+public:
+    void Process(const std::string &value)//左值
+    {
+        std::cout<<"lvalue\n";
+    }
+    void Process(std::string &&value)//右值引用
+    {
+        std::cout<<"rvalue\n";
+    }
+
+    template<typename T>
+    void callProcess(T &&param)
+    {
+        //Process(param);//param被当做参数再次调用的时候，默认传入的是左值，解决：完美转发
+        Process(std::forward<T>(param));
+    }
+};
+
+int main()
+{
+    Test t;
+    std::string s = "wef";
+    t.callProcess(s);
+    t.callProcess(std::move(s));
+
+    return 0;
+}
+```
+返回值：
+rvalue
+rvalue
+使用完美转发后：
+lvalue
+rvalue
+
+c++萃取技术：
+类型萃取：把类型信息提取出来，编译期
+std::cout<<std::is_integral<int>::value<<std::endl;
+
+vs偏特化
+
+
+序列化Jason：文本化   结构体变字符串
+反序列化：文本变成内存，例如：字符串变结构体
+![](${currentFileDir}/20230926103626.png)
+
+判断一个类中是否有某个函数
+
+工具源 void_t
+
+SFINAF：substitution failure is not an error。匹配失败不是错误。
+只要模板有一个函数能匹配上就不会报错
+
+enable_if
+![](${currentFileDir}/20230926113905.png)
+
+
+
+qt：gui core xml multimedia
+跨平台特性
+编辑器+编译套件：编译器+调试器
+                gnc c/msvc/clang
+
+Qmainwindow：菜单界面
+Qwidget：窗口界面
+Qdialog：对话框
+.ui界面文件
+
+ui文件不参与编译
+
+
+信号和槽机制：相应的信号触发，运行槽函数
+绑定信号和槽：connect（信号的发出者，发出的信号类型，信号的接受者，接受者执行的槽函数）；
+
+listwidget：Item是节点
