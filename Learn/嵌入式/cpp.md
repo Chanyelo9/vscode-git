@@ -1228,3 +1228,18 @@ qt样式表：css
 样式表：.qss
 
 hover：鼠标悬停
+
+qt对象树：vector<child> 父空间释放，子空间也自动释放
+
+对话框Dialog
+QMessageBox：消息对话框
+
+自定义信号
+
+链接动态库：pro 加上LIBS += -lStdMyString -lSqlite3
+
+
+聊天室qt化
+远程音乐播放器：文件服务器：登录注册界面，远程发送歌单，远程下载歌曲，样式表的界面美化
+
+Switch button
