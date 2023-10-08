@@ -1240,6 +1240,48 @@ QMessageBox：消息对话框
 
 
 聊天室qt化
-远程音乐播放器：文件服务器：登录注册界面，远程发送歌单，远程下载歌曲，样式表的界面美化
+远程音乐播放器：文件服务器（大文件传输）：登录注册界面，远程发送歌单，远程下载歌曲，样式表的界面美化
+客户端，Web化
 
 Switch button
+
+背景：
+事件模块：
+QEvent子类重写父类的虚对象
+绘图事件 paintEvent update()：刷新图片
+键盘事件 
+鼠标事件
+
+系统变量
+
+QDialog：对话框
+
+XML：可扩展性的标记语言
+树形结构
+Nodepad++
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<根节点>
+    <子节点>
+        <数据 元素含义="年龄">10</数据> //文本节点
+    <子节点>
+</根节点>
+```
+
+Qt
+minixml
+
+树形结点：QDomNode
+
+Qt::UserRole
+std::variant(C++17)当成any使用，在Userrole上存放东西
+
+
+客户端登录可以选择服务器，并且下次启动时lineEdit是上次修改完的ip（存放在本地xml）
+弹出界面输入ip和端口
+自己设置服务器ip，点击生效
+
+
+[图片旋转](https://blog.csdn.net/weixin_43676892/article/details/115509507?ops_request_misc=&request_id=&biz_id=102&utm_term=qt%E9%9F%B3%E4%B9%90%E6%92%AD%E6%94%BE%E5%9B%BE%E7%89%87%E6%9A%82%E5%81%9C%E6%97%8B%E8%BD%AC&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-0-115509507.142^v95^insert_down1&spm=1018.2226.3001.4187)
+
+[颜色](https://blog.csdn.net/qhy1314520/article/details/119104897)
