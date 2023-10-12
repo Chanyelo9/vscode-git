@@ -1190,8 +1190,8 @@ std::cout<<std::is_integral<int>::value<<std::endl;
 vs偏特化
 
 
-序列化Jason：文本化   结构体变字符串
-反序列化：文本变成内存，例如：字符串变结构体
+序列化Jason：文本化  内存数据变文本数据  如：结构体变字符串
+反序列化：文本变成内存数据，例如：字符串变结构体
 ![](${currentFileDir}/20230926103626.png)
 
 判断一个类中是否有某个函数
@@ -1262,6 +1262,9 @@ Nodepad++
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <根节点>
+    <Port>  //element
+        8888 //text
+    </Port>
     <子节点>
         <数据 元素含义="年龄">10</数据> //文本节点
     <子节点>
@@ -1273,6 +1276,38 @@ minixml
 
 树形结点：QDomNode
 
+#### QDomDocument
+```c++
+//创建文件
+QString StrFile = QString("../text.xml");
+if(QFile::exists(StrFile))
+{
+    QFile::remove(StrFile);
+}
+```
+```c++
+//添加根节点
+    QDomElement root=doc.createElement("library");
+    doc.appendChild(root);
+//添加第一个子节点及其子元素
+//方式一：创建属性  其中键值对的值可以是各种类型
+    QDomElement book=doc.createElement("book");
+    book.setAttribute("id",1); 
+//方式二：创建属性 值必须是字符串
+    QDomAttr time=doc.createAttribute("time"); 
+    time.setValue("2013/6/13");
+    book.setAttributeNode(time);
+    book.appendChild(title);
+    title.appendChild(text);
+//创建子元素    
+    QDomElement title=doc.createElement("title"); 
+    QDomText text; //设置括号标签中间的值
+    text=doc.createTextNode("C++ primer");
+    //从下往上添加
+    author.appendChild(text);
+    book.appendChild(author);
+    root.appendChild(book);
+```
 Qt::UserRole
 std::variant(C++17)当成any使用，在Userrole上存放东西
 
@@ -1285,3 +1320,97 @@ std::variant(C++17)当成any使用，在Userrole上存放东西
 [图片旋转](https://blog.csdn.net/weixin_43676892/article/details/115509507?ops_request_misc=&request_id=&biz_id=102&utm_term=qt%E9%9F%B3%E4%B9%90%E6%92%AD%E6%94%BE%E5%9B%BE%E7%89%87%E6%9A%82%E5%81%9C%E6%97%8B%E8%BD%AC&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-0-115509507.142^v95^insert_down1&spm=1018.2226.3001.4187)
 
 [颜色](https://blog.csdn.net/qhy1314520/article/details/119104897)
+[颜色](https://blog.csdn.net/zy_heu/article/details/78952173)
+[QWidget设置背景图片](https://blog.csdn.net/zhangliyun0393/article/details/117854776?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-2-117854776-blog-105628878.235%5Ev38%5Epc_relevant_sort_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-2-117854776-blog-105628878.235%5Ev38%5Epc_relevant_sort_base1&utm_relevant_index=3)
+
+
+## 1010
+CS架构：
+服务器：**网络通信**（socket）+ **数据存储**（数据库登录注册sqlite3）
+客户端：网络通信+人机交互（UI界面）
+
+![](${currentFileDir}/20231010091707.png)
+
+![](${currentFileDir}/20231010103440.png)
+
+![](${currentFileDir}/20231010103828.png)
+
+```
+g++ -shared -fPIC StdSqlite.cpp StdTcp.cpp ThreadPool.cpp -o libMyStd.sov
+sudo cp libMyStd.so /usr/lib
+sudo cp StdSqlite.h StdTcp.h ThreadPool.h /usr/include
+g++ main.cpp -o main -lMyStd -lsqlite3
+```
+![](${currentFileDir}/20231010112422.png)
+
+**配置中心**：xml配置，创建xmlconfig类，创建map，从map获取配置
+![](${currentFileDir}/20231010142440.png)
+map在内存，只有保存在本地，才能持久保存
+
+
+单例模式：
+模块在一个进程中只能有一个实例，所有的上层模块只调用该实例。
+
+**日志系统**：
+
+
+## 1012
+```xml
+<配置>
+    <字段>fromname</字段>
+</配置>
+```
+"fromname:zhangsan"
+序列化Jason：JavaScript的对象标记法
+本质：轻量级的文本格式
+和xml比：更小
+
+jsonobject:json对象
+{
+
+}
+
+键值对：
+"name":"zhangsan" 值：字符串,int,bool,null
+数组：[]
+```Json
+{
+    "name":"zhangsan",
+    "age":22,
+    "class":["chinese", "math"];
+    //还可以嵌套
+    "obj":
+    {
+
+    }
+}
+```
+
+qt语句的劫持
+echo hello >> 1.txt //重定向，可以改变log文件
+
+
+![](${currentFileDir}/20231012114120.png)
+1、c/ s架构socket Tcp
+2、服务器:线程池技术、内存池、
+3、客户端:xml本地化配置，QT前端界面，qss样式表，信号和槽
+4、通信:通信数据格式:json:方式:加密opensscl
+5、大文件传输
+6、心跳检测方式
+7、Linux上写库部署库
+
+技能：
+以上，加上Linux上写库部署库
+
+
+http协议：超文本传输协议
+请求+应答
+状态码：
+2xx：成功
+3xx：请求的资源发生变动，需要重新请求
+4xx：404：not found  403：被禁止
+5xx：服务端出现问题 503：服务器繁忙，无法响应  502：网关错误
+http字段：
+host：主机域名 www.baidu.com
+
+TCP的CS是请求+应答，UDP无应答
