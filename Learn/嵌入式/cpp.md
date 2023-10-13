@@ -1412,5 +1412,39 @@ http协议：超文本传输协议
 5xx：服务端出现问题 503：服务器繁忙，无法响应  502：网关错误
 http字段：
 host：主机域名 www.baidu.com
+DNS：域名解析服务：域名解析成IP
+内网穿透技术：搭建自己的服务器，个人云盘
+
+content-length：服务器返回的文本长度
+content-type：数据格式
+content-encoding：数据的压缩方式
+
+请求方式：
+get：获取资源
+Post：对发送的资源进行处理
 
 TCP的CS是请求+应答，UDP无应答
+
+https：加密的http
+
+打包：
+D:\qt\Qt5.12.2\5.12.2\mingw73_64>windeployqt C:\Users\Dell\Desktop\test\http.exe
+
+openai
+![](${currentFileDir}/20231012172322.png)
+
+文心一言
+吾爱破解
+gitee
+
+模板元编程
+enum变struct
+
+内存池GitHub
+线程池
+CS架构基于线程池+io复用并发聊天室
+![](${currentFileDir}/20231012175729.png)
+
+美化：
+![](${currentFileDir}/20231012175158.png)
+
