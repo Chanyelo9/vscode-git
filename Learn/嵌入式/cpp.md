@@ -1472,7 +1472,7 @@ moveToThread：把对象放进线程进行处理
 3.QThreadPool线程池
 （1）.继承Qrunable，重写run函数
 
-FTP协议：文件传输协议
+FTP协议：文件传输协议（支持多线程）
 C/S架构的应用层协议
 面向连接的，可靠的
 真正连接传文件的端口：20
@@ -1502,4 +1502,67 @@ reply和manager不能在不同的线程中被创建
 (3)eventLoop.exec();
 ![](${currentFileDir}/20231017190509.png)
 
-![Alt text](image.png)
+![简历](image.png)
+
+
+## 1019
+MySQL：服务器型数据库 mysql-server mysql-client
+重量级 但安全
+
+8.0.34
+
+更改语言：
+alter database student character set gbk; utf8
+show create database student;
+desc test;
+修改类型：
+alter table test modify name text;
+alter table test rename to stu;
+修改整个字段：
+alter table stu change name stuname char;
+添加字段：
+alter table stu add age int;
+
+
+mysql索引
+在数据表的字段上添加的一种数据结构（二叉平衡树（b+）树
+优点：提高检索效率
+缺点：本质也是一张表，提高数据库的维护成本
+
+使用场景：
+1.主键和unique自动添加索引
+
+事务：
+对数据库的一系列操作，一起成功或者一起失败
+特性：原子性、一致性。隔离性、持久性
+
+事务操作：
+1.mysql默认隐式事务
+2.autocommit off：关闭自动提交
+3.命令处理
+4.提交commit 回滚rollback
+5.start transaction
+6.部分回滚操作 savepoint p1;打断点
+              rollback to p1;
+7.只读事务
+
+事务的一些问题：
+1.更新丢失：
+2.脏读
+3.重读
+4.幻读
+事务的隔离级别：
+1.读未提交 read uncommited
+2.读已提交 read commited
+3.可重复读 repeatable read
+4.串行化读 serializable
+
+#include <mysql/mysql.h>
+g++ mysql.cpp -o mysql -lmysqlclient
+
+
+第三种池化：mysql的池化
+
+
+![技能](${currentFileDir}/20231019175933.png)
+openai ftmmp
