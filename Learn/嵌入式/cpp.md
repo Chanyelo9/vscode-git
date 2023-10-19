@@ -1564,5 +1564,7 @@ g++ mysql.cpp -o mysql -lmysqlclient
 第三种池化：mysql的池化
 
 
-![技能](${currentFileDir}/20231019175933.png)
+<!-- ![技能](${currentFileDir}/20231019175933.png) -->
+![技能](${currentFileDir}/20231019180358.png)
 openai ftmmp
+C++反射功能
