@@ -1448,3 +1448,58 @@ CS架构基于线程池+io复用并发聊天室
 美化：
 ![](${currentFileDir}/20231012175158.png)
 
+## 1014
+QT的主线程用来显示界面：UI线程
+把耗时函数放在UI线程中运行会阻塞UI线程，让界面卡顿
+耗时函数不应该放在主线程运行，放在子线程中运行
+
+QThread类
+真正的线程执行逻辑放在run函数（虚函数）中
+进行多线程：重写run
+
+视频：QT源对象系统
+
+moveToThread：把对象放进线程进行处理
+
+数据全部进行json序列化操作
+
+魔塔
+
+## 1017
+多线程
+1.继承QThread，重写run函数
+2.继承QObject，moverothread
+3.QThreadPool线程池
+（1）.继承Qrunable，重写run函数
+
+FTP协议：文件传输协议
+C/S架构的应用层协议
+面向连接的，可靠的
+真正连接传文件的端口：20
+默认端口：21 传输命令
+传文件的模式：
+（1）主动模式：
+（2）被动模式：
+
+启用或关闭Windows功能->计算机管理->Internet information Server->添加ftp站点
+ftp://192.168.1.16/
+
+基于qt的ftp文件下载
+1.单个文件下载
+2.多个文件下载
+3.同步下载
+
+ftp的断点续传
+需要Qftp模块
+
+reply和manager不能在不同的线程中被创建
+
+事件循环
+子线程内使用信号和槽：手动开启事件循环
+(1)QEventLoop eventLoop
+(2)eventLoop.quit();
+加在QNetworkReply::finished之后，退出事件
+(3)eventLoop.exec();
+![](${currentFileDir}/20231017190509.png)
+
+![Alt text](image.png)
