@@ -1361,7 +1361,7 @@ map在内存，只有保存在本地，才能持久保存
 </配置>
 ```
 "fromname:zhangsan"
-序列化Jason：JavaScript的对象标记法
+序列化Json：JavaScript的对象标记法
 本质：轻量级的文本格式
 和xml比：更小
 
@@ -1447,6 +1447,10 @@ CS架构基于线程池+io复用并发聊天室
 
 美化：
 ![](${currentFileDir}/20231012175158.png)
+
+
+百度翻译，爬取豆瓣评论
+
 
 ## 1014
 QT的主线程用来显示界面：UI线程
@@ -1568,3 +1572,92 @@ g++ mysql.cpp -o mysql -lmysqlclient
 ![技能](${currentFileDir}/20231019180358.png)
 openai ftmmp
 C++反射功能
+封的库的作用
+
+## 1024
+池化作用：减少对象创建，减少系统IO调用
+
+连接池：
+
+不使用连接池：
+mysql操作（TCP连接）：
+1、TCP建立三次握手
+2.mysql服务器认证
+3.SQL语句执行
+4.关闭mysql数据库
+5.TCP四次挥手
+缺点：
+1.网络IO调用频繁
+2.网络带宽使用率低
+3.创建大量的临时对象
+
+使用连接池：
+初始化时就生成N个连接数据库的对象，之后的访问都从这些对象进行，只执行SQL语句。
+实现思路：
+1.初始化时创建N个对象，实施连接
+2.获取对象进行操作
+3.归还对象到连接池
+
+stdmysql 里的private *p里的mysql进行了
+浅拷贝，mysql内存二次释放
+
+连接池为什么使用队列：
+mysql会自动关闭连接，网络可能会不稳定导致数据库对象无法使用
+
+什么时候使用了智能指针：
+创建连接池stdmysqlpool时，对stdmysql 里的private *p里的mysql对象进行了浅拷贝，避免了mysql对象内存二次释放.
+核心：用auto mysql = std::make_shared<StdMySql>(); 代替 StdMySql mysql;
+三处修改：           
+```c++
+std::shared_ptr<StdMySqlPrivate> p;
+
+StdMySql::StdMySql():p(std::make_shared<StdMySqlPrivate>())
+{
+    mysql_init(&p->mysql);
+    p->isConnected = false;
+}
+//析构不用delete p；
+StdMySql::~StdMySql()
+{
+    if(p->isConnected == true)
+    {
+        mysql_close(&p->mysql);
+    }
+    // delete p;
+}
+```
+编译：加上  -lmysqlclient
+
+StdMySql整合了StsMySqlPool
+
+QT: StdMySql项目
+LIBS += -lStdMySql -lmysqlclient
+
+
+show和exec：
+show：非模态对话框（显示之后窗体控制权会直接交出）：不会阻塞主界面
+exec：模态对话框：直到关闭该界面才会移交窗体控制权
+
+
+
+算法的时间复杂度：循环体的循环次数
+空间复杂度：实施一个算法所需的额外空间
+
+表示法：大O渐进法
+![](${currentFileDir}/20231024172850.png)
+
+
+排序算法
+
+
+
+
+
+
+
+
+
+
+cd QtProject/BrainStorming/build-BSServer-Desktop_Qt_5_12_2_GCC_64bit-Debug
+
+
