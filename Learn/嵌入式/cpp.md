@@ -1430,6 +1430,8 @@ https：加密的http
 打包：
 D:\qt\Qt5.12.2\5.12.2\mingw73_64>windeployqt C:\Users\Dell\Desktop\test\http.exe
 
+百度翻译[D:\百度翻译]，爬取豆瓣评论
+
 openai
 ![](${currentFileDir}/20231012172322.png)
 
@@ -1448,8 +1450,6 @@ CS架构基于线程池+io复用并发聊天室
 美化：
 ![](${currentFileDir}/20231012175158.png)
 
-
-百度翻译，爬取豆瓣评论
 
 
 ## 1014
@@ -1573,6 +1573,16 @@ g++ mysql.cpp -o mysql -lmysqlclient
 openai ftmmp
 C++反射功能
 封的库的作用
+git仓库管理
+C文件服务器，ftp服务器
+* 为什么这样写？？？
+
+哈希表：就是通过将关键值也就是key通过一个散列函数加工处理之后得到一个值，这个值就是数据存放的位置，我们就可以根据这个值快速的找到我们想要的数据，本质是数组。
+
+C++反射：
+反射用于在运行时获取类型信息，提高编程的灵活性，如简化json/xml解析，脚本绑定，属性编辑器等。但C++没有提供反射的支持，只能自己实现。
+反射特点：
+1.
 
 ## 1024
 池化作用：减少对象创建，减少系统IO调用
@@ -1605,7 +1615,7 @@ stdmysql 里的private *p里的mysql进行了
 mysql会自动关闭连接，网络可能会不稳定导致数据库对象无法使用
 
 什么时候使用了智能指针：
-创建连接池stdmysqlpool时，对stdmysql 里的private *p里的mysql对象进行了浅拷贝，避免了mysql对象内存二次释放.
+创建连接池stdmysqlpool时，对stdmysql 里的private *p里的mysql对象进行了**浅拷贝**，避免了mysql对象**内存二次释放**.
 核心：用auto mysql = std::make_shared<StdMySql>(); 代替 StdMySql mysql;
 三处修改：           
 ```c++
@@ -1661,3 +1671,154 @@ exec：模态对话框：直到关闭该界面才会移交窗体控制权
 cd QtProject/BrainStorming/build-BSServer-Desktop_Qt_5_12_2_GCC_64bit-Debug
 
 
+
+
+设计模式：被广泛知晓的，被广泛使用的可靠的设计模板
+13种：
+创建型模式：如何高校创建对象
+结构型模式：思考类和类之间的解码
+行为型模式：思考类和类之间的协同工作
+
+创建型模式：
+1.开闭原则：对扩展开放，对修改关闭
+2.里氏代换原则：基类出现的地方，子类一定能替换使用
+3.依赖倒置原则：面向接口编程
+4.接口隔离原则：每个接口不依赖于别的接口，干自己所有该干的事情
+5.迪米特法则：最少知道原则：一个实体应该尽量少和别的实体发生联系
+6.单一职责原则：一个类只完成一个领域的功能
+
+1.单例模式：一个类只允许创建一个对象  模块化：
+(1)构造函数私有化
+```c++
+class Singleton
+{
+public:
+    //对外的获取对象的静态接口
+    static Singleton* getInstance()
+    {
+        std::lock_guard<std::mutex> lock(m);
+        if(m_instance == nullptr)
+        {
+            m_instance = new Singleton;
+        }
+        return m_instance;
+    }
+
+    //对外释放单例的接口
+    static void Release()
+    {
+        object--;
+        if(m_instance != nullptr)
+        {
+            delete m_instance;
+            m_instance = nullptr;
+        }
+    }
+private:
+    Singleton()
+    {
+        ...
+    }
+    static Singleton *m_instance;
+}
+Singleton* Singleton::m_instance = nullptr;
+```
+(2)提供一个统一的对外接口
+  * 懒汉式：对象在调用接口的时候才进行构造。线程不安全
+    在对外接口中加锁
+    std::mutex m;//全局定义
+    std::lock_guard<std::mutex> lock(m);
+  * 饿汉式：对象在初始化时构造。会发生没必要的初始化
+2.工厂模式
+(1)简单工厂：一个工厂创建多种产品
+(2)工厂方法：同时抽象产品和工厂，增加新的产品和工厂不需要改动原来的代码  **抽象类**
+(3)抽象工厂：同一个工厂可以生产同一类的产品 
+3.建造者模式 （builder模式）
+(1)产品：复杂的类，包含多个模块的组成
+(2)抽象的建造者：定义了生成一个产品需要哪些模块组成
+(3)具体的建造者：具体的定义模块
+(4)指挥者：决定建造的具体顺序
+* 优点：
+* * 1.灵活性：使对象的构建顺序更加灵活
+* * 2.**解耦**：分离对象的创建和使用
+* * //定义建造者具体类型
+    Assemble *m = new AssembleAB;
+    //把建造者类型给指挥者
+    Director *d = new Director(m);
+* * 3.易展性
+* 缺点：
+* * 1.类变多，系统复杂性变高
+* * 2.运行效率变低
+4.原型模式：克隆模式
+核心：
+```c++
+class Clone
+{
+public:
+    virtual Clone* clone() = 0;
+}
+class person:public Clone
+{
+    Clone* clone()
+    {
+        //深拷贝 是内容拷贝而不是值拷贝
+        //person *p = new person(*this);
+        person *p = new person;
+        *p = *this;
+        return p;
+    }
+}
+```
+
+结构型模式：
+1.桥接模式：解耦两个变化的维度
+2.适配器模式：让两个完全不相干的类在一起工作
+（1）类适配器：多继承
+ ```c++
+ class Adapter:public USB, public TypeC
+{
+public:
+    void IsTypeC()override
+    {
+        IsUSB();
+    }
+};
+ ```
+（2）对象适配器：组合
+ ```c++
+ class Adapter:public TypeC
+{
+public:
+    void IsTypeC()override
+    {
+        u->IsUSB();
+    }
+private:
+    USB *u = new USB;//使用组合 或者继承
+};
+ ```
+3.装饰模式：decorate：既能给原类添加功能，又不能改变原类的结构
+被装饰的基类抽象类
+被装饰的具体类
+装饰类的抽象类
+装饰类的具体类
+缺点：
+* 1.类变多，系统复杂性变高
+* 2.运行效率变低
+
+4.享元模式（对象池）：共享对象：减少对象的创造和销毁，提高系统效率
+对象能够共享的部分：内部状态
+不能共享的部分：外部状态
+> 黑白棋
+![](${currentFileDir}/20231027103110.png)
+
+
+虚析构：避免基类对象释放时派生类对象无法释放？
+
+## 1028
+5.外观模式：多个没有关系的类协调工作
+使用场景：初始化加载模块的时候
+
+6.代理模式：在客户端和目标之间添加一层认证，以控制对目标对象的访问
+用户和类的沟通桥梁
+保证后台类的数据安全
